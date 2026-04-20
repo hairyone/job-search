@@ -9,6 +9,8 @@ function JobList({ jobs, selectedJob, onSelectJob, loading }) {
       'Interview Scheduled': '#ffc107',
       'Interviewed': '#ff9800',
       'Offer': '#28a745',
+      'No Response': '#17a2b8',
+      'Applications Closed': '#6c757d',
       'Rejected': '#dc3545',
       'Declined': '#6c757d',
       'Accepted': '#28a745'

@@ -40,6 +40,8 @@ function Header({ onAddJob, filters, setFilters }) {
             <option value="Interview Scheduled">Interview Scheduled</option>
             <option value="Interviewed">Interviewed</option>
             <option value="Offer">Offer</option>
+            <option value="No Response">No Response</option>
+            <option value="Applications Closed">Applications Closed</option>
             <option value="Rejected">Rejected</option>
             <option value="Declined">Declined</option>
             <option value="Accepted">Accepted</option>

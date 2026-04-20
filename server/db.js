@@ -14,7 +14,7 @@ const initialize = async () => {
         company VARCHAR(255) NOT NULL,
         position VARCHAR(255) NOT NULL,
         source VARCHAR(50) NOT NULL CHECK (source IN ('Indeed', 'LinkedIn', 'Other')),
-        status VARCHAR(50) NOT NULL DEFAULT 'Applied' CHECK (status IN ('Saved', 'Applied', 'Interview Scheduled', 'Interviewed', 'Offer', 'Rejected', 'Declined', 'Accepted')),
+        status VARCHAR(50) NOT NULL DEFAULT 'Applied' CHECK (status IN ('Saved', 'Applied', 'Interview Scheduled', 'Interviewed', 'Offer', 'Rejected', 'Declined', 'Accepted', 'No Response', 'Applications Closed')),
         job_url TEXT,
         location VARCHAR(255),
         salary_range VARCHAR(100),
