@@ -1,4 +1,5 @@
 const { Pool } = require('pg');
+const { runMigrations } = require('./migrate');
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -8,13 +9,14 @@ const pool = new Pool({
 const initialize = async () => {
   const client = await pool.connect();
   try {
+    // Create tables (without strict constraints that might need updates)
     await client.query(`
       CREATE TABLE IF NOT EXISTS jobs (
         id SERIAL PRIMARY KEY,
         company VARCHAR(255) NOT NULL,
         position VARCHAR(255) NOT NULL,
-        source VARCHAR(50) NOT NULL CHECK (source IN ('Indeed', 'LinkedIn', 'Other')),
-        status VARCHAR(50) NOT NULL DEFAULT 'Applied' CHECK (status IN ('Saved', 'Applied', 'Interview Scheduled', 'Interviewed', 'Offer', 'Rejected', 'Declined', 'Accepted', 'No Response', 'Applications Closed')),
+        source VARCHAR(50) NOT NULL,
+        status VARCHAR(50) NOT NULL DEFAULT 'Applied',
         job_url TEXT,
         location VARCHAR(255),
         salary_range VARCHAR(100),
@@ -24,6 +26,31 @@ const initialize = async () => {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
+    `);
+
+    // Add constraints if table is newly created
+    await client.query(`
+      DO $$
+      BEGIN
+        IF NOT EXISTS (
+          SELECT 1 FROM pg_constraint WHERE conname = 'jobs_source_check'
+        ) THEN
+          ALTER TABLE jobs ADD CONSTRAINT jobs_source_check 
+            CHECK (source IN ('Indeed', 'LinkedIn', 'Other'));
+        END IF;
+      END $$;
+    `);
+
+    await client.query(`
+      DO $$
+      BEGIN
+        IF NOT EXISTS (
+          SELECT 1 FROM pg_constraint WHERE conname = 'jobs_status_check'
+        ) THEN
+          ALTER TABLE jobs ADD CONSTRAINT jobs_status_check 
+            CHECK (status IN ('Saved', 'Applied', 'Interview Scheduled', 'Interviewed', 'Offer', 'Rejected', 'Declined', 'Accepted', 'No Response', 'Applications Closed'));
+        END IF;
+      END $$;
     `);
 
     await client.query(`
@@ -63,6 +90,9 @@ const initialize = async () => {
     `);
 
     console.log('Database initialized successfully');
+    
+    // Run migrations after initial setup
+    await runMigrations();
   } catch (error) {
     console.error('Database initialization error:', error);
     throw error;
