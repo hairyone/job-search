@@ -21,7 +21,7 @@ A full-stack web application to track job applications from Indeed, LinkedIn, an
 - **Frontend**: React 18
 - **Backend**: Node.js + Express
 - **Database**: PostgreSQL
-- **Hosting**: Render (Free tier)
+- **Hosting**: Railway (Free tier - $5 credit/month)
 
 ## Local Development
 
@@ -69,62 +69,52 @@ A full-stack web application to track job applications from Indeed, LinkedIn, an
    - Frontend: http://localhost:3000
    - Backend API: http://localhost:3000/api
 
-## Deploy to Render (Free Hosting)
+## Deploy to Railway (Free Hosting)
 
-### One-Click Deployment
+### Quick Deployment (No Credit Card Required)
 
-1. **Push to GitHub**
-   ```bash
-   git init
-   git add .
-   git commit -m "Initial commit"
-   git branch -M main
-   git remote add origin <your-github-repo-url>
-   git push -u origin main
-   ```
+1. **Go to Railway**
+   - Visit [Railway.app](https://railway.app)
+   - Click **"Login"** and sign in with GitHub
 
-2. **Connect to Render**
-   - Go to [Render.com](https://render.com) and sign up/login
-   - Click "New" → "Blueprint"
-   - Connect your GitHub repository
-   - Render will automatically detect the `render.yaml` file
+2. **Deploy from GitHub**
+   - Click **"New Project"**
+   - Select **"Deploy from GitHub repo"**
+   - Choose `hairyone/job-search`
+   - Railway will automatically detect and deploy your app
 
-3. **Auto-Setup**
-   - Render will create:
-     - A web service for your app
-     - A PostgreSQL database (free tier)
-     - Environment variables are configured automatically
+3. **Add PostgreSQL Database**
+   - In your project, click **"+ New"**
+   - Select **"Database"** → **"Add PostgreSQL"**
+   - Railway automatically creates and links the database
+   - Environment variable `DATABASE_URL` is auto-configured
 
-4. **Wait for deployment** (5-10 minutes)
-   - Render will install dependencies, build the app, and start the server
-   - You'll get a URL like: `https://job-tracker-xxxx.onrender.com`
+4. **Configure Build (if needed)**
+   - Railway auto-detects settings, but you can customize:
+   - Build Command: `npm run railway:build`
+   - Start Command: `npm start` (auto-detected)
 
-5. **Done!** Your app is live and accessible from anywhere
+5. **Get Your URL**
+   - Click on your service → **"Settings"** → **"Generate Domain"**
+   - You'll get a URL like: `https://job-search-production.up.railway.app`
 
-### Manual Deployment (Alternative)
+6. **Done!** Your app is live
 
-If you prefer manual setup:
+### Free Tier Details
 
-1. **Create PostgreSQL Database**
-   - In Render dashboard: New → PostgreSQL
-   - Name: `job-tracker-db`
-   - Free tier is sufficient
-
-2. **Create Web Service**
-   - New → Web Service
-   - Connect your GitHub repo
-   - Configure:
-     - Build Command: `npm run install:all && npm run build`
-     - Start Command: `npm start`
-     - Add environment variable: `DATABASE_URL` (copy from PostgreSQL dashboard)
+- **$5 credit per month** (no credit card required)
+- Enough for ~500 hours of usage
+- PostgreSQL database included
+- No sleep mode (unlike Render)
+- Better performance than Render free tier
 
 ## Environment Variables
 
 Required for production:
 
-- `DATABASE_URL`: PostgreSQL connection string (auto-configured by Render)
-- `NODE_ENV`: Set to `production`
-- `PORT`: Server port (auto-configured by Render)
+- `DATABASE_URL`: PostgreSQL connection string (auto-configured by Railway)
+- `NODE_ENV`: Set to `production` (auto-configured by Railway)
+- `PORT`: Server port (auto-configured by Railway)
 
 Optional (for Google Drive features):
 
@@ -182,22 +172,25 @@ For direct file uploads, you'll need to:
 
 ## Free Tier Limitations
 
-- **Render Web Service**: 750 hours/month (enough for one app)
-- **PostgreSQL**: 90 days, then expires (upgrade to paid or migrate data)
-- **Sleep Mode**: App sleeps after 15 minutes of inactivity (wakes on request)
-- **Build Time**: Limited build minutes (plenty for this app)
+- **Railway Free Tier**: $5 credit per month
+- Approximately 500 hours of usage (for this app size)
+- PostgreSQL database included
+- **No sleep mode** - app stays awake
+- After $5 credit is used, app pauses until next month
 
 ## Tips
 
-- The app will sleep after 15 minutes of no traffic (free tier)
-- First request after sleep takes 30-60 seconds to wake up
-- Consider using a service like [UptimeRobot](https://uptimerobot.com/) to ping your app every 5-10 minutes to keep it awake
+- Monitor your Railway usage in the dashboard
+- The $5/month credit is usually sufficient for personal apps
+- No cold starts - better performance than Render free tier
+- Database backups available in paid plans
 
 ## Upgrading
 
-To keep the app always awake and get better performance:
-- Upgrade Render plan to paid ($7/month)
-- Or migrate to Vercel + Supabase (both have better free tiers)
+If you need more resources:
+- **Railway Hobby Plan**: $5/month + usage-based pricing
+- **Railway Pro Plan**: $20/month + usage-based pricing
+- Alternative: Migrate to Vercel + Supabase (both have generous free tiers)
 
 ## License
 
