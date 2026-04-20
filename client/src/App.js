@@ -15,6 +15,7 @@ function App() {
   const [filters, setFilters] = useState({ status: '', source: '', search: '' });
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showMobileList, setShowMobileList] = useState(true);
 
   const fetchJobs = useCallback(async () => {
     try {
@@ -46,6 +47,7 @@ function App() {
     setEditingJob(null);
     setShowForm(true);
     setSelectedJob(null);
+    setShowMobileList(false); // Hide list on mobile when opening form
   };
 
   const handleEditJob = (job) => {
@@ -90,9 +92,16 @@ function App() {
       const detailedJob = await api.getJob(job.id);
       setSelectedJob(detailedJob);
       setShowForm(false);
+      setShowMobileList(false); // Hide list on mobile when viewing details
     } catch (error) {
       console.error('Failed to fetch job details:', error);
     }
+  };
+
+  const handleBackToList = () => {
+    setSelectedJob(null);
+    setShowForm(false);
+    setShowMobileList(true);
   };
 
   const handleAddAttachment = async (jobId, attachmentData) => {
@@ -122,7 +131,7 @@ function App() {
       <Header onAddJob={handleAddJob} filters={filters} setFilters={setFilters} />
       
       <div className="main-container">
-        <aside className="sidebar">
+        <aside className={`sidebar ${showMobileList ? 'show-mobile' : 'hide-mobile'}`}>
           {stats && <Stats stats={stats} />}
           <JobList
             jobs={jobs}
@@ -132,21 +141,31 @@ function App() {
           />
         </aside>
 
-        <main className="content">
+        <main className={`content ${!showMobileList ? 'show-mobile' : 'hide-mobile'}`}>
           {showForm ? (
-            <JobForm
-              job={editingJob}
-              onSave={handleSaveJob}
-              onCancel={() => setShowForm(false)}
-            />
+            <>
+              <button className="back-button mobile-only" onClick={handleBackToList}>
+                ← Back to List
+              </button>
+              <JobForm
+                job={editingJob}
+                onSave={handleSaveJob}
+                onCancel={() => setShowForm(false)}
+              />
+            </>
           ) : selectedJob ? (
-            <JobDetails
-              job={selectedJob}
-              onEdit={() => handleEditJob(selectedJob)}
-              onDelete={() => handleDeleteJob(selectedJob.id)}
-              onAddAttachment={handleAddAttachment}
-              onDeleteAttachment={handleDeleteAttachment}
-            />
+            <>
+              <button className="back-button mobile-only" onClick={handleBackToList}>
+                ← Back to List
+              </button>
+              <JobDetails
+                job={selectedJob}
+                onEdit={() => handleEditJob(selectedJob)}
+                onDelete={() => handleDeleteJob(selectedJob.id)}
+                onAddAttachment={handleAddAttachment}
+                onDeleteAttachment={handleDeleteAttachment}
+              />
+            </>
           ) : (
             <div className="empty-state">
               <h2>Welcome to Job Application Tracker</h2>
