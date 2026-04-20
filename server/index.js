@@ -7,6 +7,7 @@ const path = require('path');
 const db = require('./db');
 const jobsRouter = require('./routes/jobs');
 const attachmentsRouter = require('./routes/attachments');
+const basicAuth = require('./middleware/auth');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -19,6 +20,16 @@ app.use(compression());
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Apply authentication to all routes (except health check)
+if (process.env.NODE_ENV === 'production') {
+  app.use((req, res, next) => {
+    if (req.path === '/api/health') {
+      return next();
+    }
+    basicAuth(req, res, next);
+  });
+}
 
 // API Routes
 app.use('/api/jobs', jobsRouter);

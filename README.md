@@ -115,12 +115,27 @@ Required for production:
 - `DATABASE_URL`: PostgreSQL connection string (auto-configured by Railway)
 - `NODE_ENV`: Set to `production` (auto-configured by Railway)
 - `PORT`: Server port (auto-configured by Railway)
+- `AUTH_USERNAME`: Username for basic authentication (REQUIRED for security)
+- `AUTH_PASSWORD`: Password for basic authentication (REQUIRED for security)
 
 Optional (for Google Drive features):
 
 - `GOOGLE_CLIENT_ID`: Google OAuth client ID
 - `GOOGLE_CLIENT_SECRET`: Google OAuth client secret
 - `GOOGLE_REDIRECT_URI`: OAuth redirect URI
+
+## Setting Up Authentication on Railway
+
+**IMPORTANT:** The app uses HTTP Basic Authentication to protect your data.
+
+1. In Railway dashboard, go to your web service
+2. Click **"Variables"** tab
+3. Add these environment variables:
+   - `AUTH_USERNAME`: Choose a username (e.g., your email or "admin")
+   - `AUTH_PASSWORD`: Choose a strong password
+4. Redeploy
+
+When you visit your app, you'll be prompted to enter username/password.
 
 ## Google Drive Integration
 
