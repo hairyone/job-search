@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './App.css';
 import api from './api';
 import JobList from './components/JobList';
@@ -16,12 +16,7 @@ function App() {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchJobs();
-    fetchStats();
-  }, [filters]);
-
-  const fetchJobs = async () => {
+  const fetchJobs = useCallback(async () => {
     try {
       setLoading(true);
       const data = await api.getJobs(filters);
@@ -31,16 +26,21 @@ function App() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters]);
 
-  const fetchStats = async () => {
+  const fetchStats = useCallback(async () => {
     try {
       const data = await api.getStats();
       setStats(data);
     } catch (error) {
       console.error('Failed to fetch stats:', error);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchJobs();
+    fetchStats();
+  }, [fetchJobs, fetchStats]);
 
   const handleAddJob = () => {
     setEditingJob(null);
