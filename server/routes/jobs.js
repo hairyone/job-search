@@ -28,7 +28,7 @@ router.get('/', async (req, res) => {
       paramCount++;
     }
 
-    query += ' ORDER BY created_at DESC';
+    query += ' ORDER BY applied_date DESC NULLS LAST, created_at DESC';
 
     const result = await db.query(query, params);
     res.json(result.rows);
