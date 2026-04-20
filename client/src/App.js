@@ -1,0 +1,165 @@
+import React, { useState, useEffect } from 'react';
+import './App.css';
+import api from './api';
+import JobList from './components/JobList';
+import JobForm from './components/JobForm';
+import JobDetails from './components/JobDetails';
+import Stats from './components/Stats';
+import Header from './components/Header';
+
+function App() {
+  const [jobs, setJobs] = useState([]);
+  const [selectedJob, setSelectedJob] = useState(null);
+  const [showForm, setShowForm] = useState(false);
+  const [editingJob, setEditingJob] = useState(null);
+  const [filters, setFilters] = useState({ status: '', source: '', search: '' });
+  const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchJobs();
+    fetchStats();
+  }, [filters]);
+
+  const fetchJobs = async () => {
+    try {
+      setLoading(true);
+      const data = await api.getJobs(filters);
+      setJobs(data);
+    } catch (error) {
+      console.error('Failed to fetch jobs:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchStats = async () => {
+    try {
+      const data = await api.getStats();
+      setStats(data);
+    } catch (error) {
+      console.error('Failed to fetch stats:', error);
+    }
+  };
+
+  const handleAddJob = () => {
+    setEditingJob(null);
+    setShowForm(true);
+    setSelectedJob(null);
+  };
+
+  const handleEditJob = (job) => {
+    setEditingJob(job);
+    setShowForm(true);
+    setSelectedJob(null);
+  };
+
+  const handleSaveJob = async (jobData) => {
+    try {
+      if (editingJob) {
+        await api.updateJob(editingJob.id, jobData);
+      } else {
+        await api.createJob(jobData);
+      }
+      setShowForm(false);
+      setEditingJob(null);
+      fetchJobs();
+      fetchStats();
+    } catch (error) {
+      console.error('Failed to save job:', error);
+      alert('Failed to save job. Please try again.');
+    }
+  };
+
+  const handleDeleteJob = async (id) => {
+    if (window.confirm('Are you sure you want to delete this job application?')) {
+      try {
+        await api.deleteJob(id);
+        setSelectedJob(null);
+        fetchJobs();
+        fetchStats();
+      } catch (error) {
+        console.error('Failed to delete job:', error);
+        alert('Failed to delete job. Please try again.');
+      }
+    }
+  };
+
+  const handleSelectJob = async (job) => {
+    try {
+      const detailedJob = await api.getJob(job.id);
+      setSelectedJob(detailedJob);
+      setShowForm(false);
+    } catch (error) {
+      console.error('Failed to fetch job details:', error);
+    }
+  };
+
+  const handleAddAttachment = async (jobId, attachmentData) => {
+    try {
+      await api.createAttachment({ ...attachmentData, job_id: jobId });
+      const updatedJob = await api.getJob(jobId);
+      setSelectedJob(updatedJob);
+    } catch (error) {
+      console.error('Failed to add attachment:', error);
+      alert('Failed to add attachment. Please try again.');
+    }
+  };
+
+  const handleDeleteAttachment = async (attachmentId) => {
+    try {
+      await api.deleteAttachment(attachmentId);
+      const updatedJob = await api.getJob(selectedJob.id);
+      setSelectedJob(updatedJob);
+    } catch (error) {
+      console.error('Failed to delete attachment:', error);
+      alert('Failed to delete attachment. Please try again.');
+    }
+  };
+
+  return (
+    <div className="app">
+      <Header onAddJob={handleAddJob} filters={filters} setFilters={setFilters} />
+      
+      <div className="main-container">
+        <aside className="sidebar">
+          {stats && <Stats stats={stats} />}
+          <JobList
+            jobs={jobs}
+            selectedJob={selectedJob}
+            onSelectJob={handleSelectJob}
+            loading={loading}
+          />
+        </aside>
+
+        <main className="content">
+          {showForm ? (
+            <JobForm
+              job={editingJob}
+              onSave={handleSaveJob}
+              onCancel={() => setShowForm(false)}
+            />
+          ) : selectedJob ? (
+            <JobDetails
+              job={selectedJob}
+              onEdit={() => handleEditJob(selectedJob)}
+              onDelete={() => handleDeleteJob(selectedJob.id)}
+              onAddAttachment={handleAddAttachment}
+              onDeleteAttachment={handleDeleteAttachment}
+            />
+          ) : (
+            <div className="empty-state">
+              <h2>Welcome to Job Application Tracker</h2>
+              <p>Select a job from the list or add a new one to get started.</p>
+              <button className="btn btn-primary" onClick={handleAddJob}>
+                + Add New Job Application
+              </button>
+            </div>
+          )}
+        </main>
+      </div>
+    </div>
+  );
+}
+
+export default App;

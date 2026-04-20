@@ -1,0 +1,53 @@
+require('dotenv').config();
+const express = require('express');
+const cors = require('cors');
+const helmet = require('helmet');
+const compression = require('compression');
+const path = require('path');
+const db = require('./db');
+const jobsRouter = require('./routes/jobs');
+const attachmentsRouter = require('./routes/attachments');
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Middleware
+app.use(helmet({
+  contentSecurityPolicy: false, // Disable for development
+}));
+app.use(compression());
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// API Routes
+app.use('/api/jobs', jobsRouter);
+app.use('/api/attachments', attachmentsRouter);
+
+// Health check
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// Serve static files from React build
+app.use(express.static(path.join(__dirname, '../client/build')));
+
+// Catch-all handler for React routing
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/build/index.html'));
+});
+
+// Initialize database and start server
+async function startServer() {
+  try {
+    await db.initialize();
+    app.listen(PORT, '0.0.0.0', () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    process.exit(1);
+  }
+}
+
+startServer();

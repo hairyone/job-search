@@ -1,0 +1,43 @@
+.job-form-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.job-form-header {
+  margin-bottom: 2rem;
+}
+
+.job-form-header h2 {
+  color: #2c3e50;
+  font-size: 2rem;
+}
+
+.job-form {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid #e1e8ed;
+}
+
+@media (max-width: 768px) {
+  .job-form {
+    padding: 1.5rem;
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+  }
+
+  .form-actions button {
+    width: 100%;
+  }
+}
