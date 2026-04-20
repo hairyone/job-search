@@ -21,7 +21,7 @@ A full-stack web application to track job applications from Indeed, LinkedIn, an
 - **Frontend**: React 18
 - **Backend**: Node.js + Express
 - **Database**: PostgreSQL
-- **Hosting**: Railway (Free tier - $5 credit/month)
+- **Hosting**: Railway (Hobby plan - $5/month)
 
 ## Local Development
 
@@ -69,13 +69,14 @@ A full-stack web application to track job applications from Indeed, LinkedIn, an
    - Frontend: http://localhost:3000
    - Backend API: http://localhost:3000/api
 
-## Deploy to Railway (Free Hosting)
+## Deploy to Railway ($5/month Hosting)
 
-### Quick Deployment (No Credit Card Required)
+### Quick Deployment
 
 1. **Go to Railway**
    - Visit [Railway.app](https://railway.app)
    - Click **"Login"** and sign in with GitHub
+   - **Note**: Railway requires the Hobby plan ($5/month) - no free tier available
 
 2. **Deploy from GitHub**
    - Click **"New Project"**
@@ -100,13 +101,13 @@ A full-stack web application to track job applications from Indeed, LinkedIn, an
 
 6. **Done!** Your app is live
 
-### Free Tier Details
+### Pricing Details
 
-- **$5 credit per month** (no credit card required)
-- Enough for ~500 hours of usage
+- **Hobby Plan**: $5/month base + usage-based pricing
 - PostgreSQL database included
-- No sleep mode (unlike Render)
-- Better performance than Render free tier
+- No sleep mode (always active)
+- Much better performance than free hosting alternatives
+- Credit card required
 
 ## Environment Variables
 
@@ -185,27 +186,34 @@ For direct file uploads, you'll need to:
 ### Contacts Table
 - `id`, `job_id`, `name`, `email`, `phone`, `position`, `notes`, `created_at`
 
-## Free Tier Limitations
+## Cost Considerations
 
-- **Railway Free Tier**: $5 credit per month
-- Approximately 500 hours of usage (for this app size)
+- **Railway Hobby Plan**: $5/month base fee + usage costs
+- Small apps like this typically cost $5-8/month total
 - PostgreSQL database included
 - **No sleep mode** - app stays awake
-- After $5 credit is used, app pauses until next month
+- Monitor usage in Railway dashboard to avoid surprises
 
 ## Tips
 
-- Monitor your Railway usage in the dashboard
-- The $5/month credit is usually sufficient for personal apps
-- No cold starts - better performance than Render free tier
+- Monitor your Railway usage in the dashboard to track costs
+- Set up usage alerts to avoid unexpected charges
+- Railway is more reliable than free hosting (no cold starts)
 - Database backups available in paid plans
 
-## Upgrading
+## Alternative Free Hosting Options
 
-If you need more resources:
-- **Railway Hobby Plan**: $5/month + usage-based pricing
+If you want completely free hosting, consider:
+- **Vercel** (frontend) + **Supabase** (database) - both have generous free tiers
+- **Render** - has a free tier but apps sleep after inactivity
+- **Fly.io** - has a small free allowance
+- Note: Free hosting typically has limitations (sleep mode, slower performance)
+
+## Upgrading Railway
+
+For more resources on Railway:
 - **Railway Pro Plan**: $20/month + usage-based pricing
-- Alternative: Migrate to Vercel + Supabase (both have generous free tiers)
+- Better performance, more build minutes, priority support
 
 ## License
 
