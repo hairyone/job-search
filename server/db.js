@@ -1,5 +1,12 @@
+require('dotenv').config();
 const { Pool } = require('pg');
 const { runMigrations } = require('./migrate');
+
+if (!process.env.DATABASE_URL) {
+  console.error('ERROR: DATABASE_URL environment variable is not set.');
+  console.error('Set DATABASE_URL to the connection string for your PostgreSQL database.');
+  process.exit(1);
+}
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
