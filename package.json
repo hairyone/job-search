@@ -10,6 +10,7 @@
     "build:client": "cd client && npm install && npm run build",
     "install:all": "npm install && cd client && npm install",
     "railway:build": "npm install && cd client && npm install && npm run build",
+    "vercel-build": "cd client && npm install && npm run build",
     "migrate": "node -e \"require('./server/migrate').runMigrations()\""
   },
   "keywords": ["job-tracker", "indeed", "linkedin"],

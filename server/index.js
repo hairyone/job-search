@@ -48,17 +48,35 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/build/index.html'));
 });
 
-// Initialize database and start server
-async function startServer() {
-  try {
+// Initialize database
+let dbInitialized = false;
+async function initializeDatabase() {
+  if (!dbInitialized) {
     await db.initialize();
-    app.listen(PORT, '0.0.0.0', () => {
-      console.log(`Server running on port ${PORT}`);
-    });
-  } catch (error) {
-    console.error('Failed to start server:', error);
-    process.exit(1);
+    dbInitialized = true;
   }
 }
 
-startServer();
+// For Vercel serverless
+if (process.env.VERCEL) {
+  // Export the app for Vercel
+  module.exports = async (req, res) => {
+    await initializeDatabase();
+    return app(req, res);
+  };
+} else {
+  // For local development and Railway
+  async function startServer() {
+    try {
+      await db.initialize();
+      app.listen(PORT, '0.0.0.0', () => {
+        console.log(`Server running on port ${PORT}`);
+      });
+    } catch (error) {
+      console.error('Failed to start server:', error);
+      process.exit(1);
+    }
+  }
+  
+  startServer();
+}

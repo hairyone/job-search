@@ -69,7 +69,132 @@ A full-stack web application to track job applications from Indeed, LinkedIn, an
    - Frontend: http://localhost:3000
    - Backend API: http://localhost:3000/api
 
+## Deploy to Vercel + Supabase (FREE Forever!)
+
+### Best for: Personal projects, permanent free hosting
+
+**Total Cost: $0/month** ✅
+
+### Step 1: Set Up Supabase Database
+
+1. **Create Supabase Account**
+   - Go to [supabase.com](https://supabase.com)
+   - Sign up with GitHub (free, no credit card required)
+
+2. **Create New Project**
+   - Click "New Project"
+   - Organization: Create a new one or use existing
+   - Name: `job-tracker` (or your choice)
+   - Database Password: Choose a strong password (save this!)
+   - Region: Choose closest to you
+   - Click "Create new project" (takes ~2 minutes)
+
+3. **Get Database Connection String**
+   - Go to "Settings" → "Database"
+   - Find "Connection string" section
+   - Select **"Connection pooling"** (better for serverless)
+   - Copy the connection string
+   - Replace `[YOUR-PASSWORD]` with your actual password
+   - Example: `postgresql://postgres.xxx:[PASSWORD]@aws-0-us-east-1.pooler.supabase.com:5432/postgres`
+   - Save this for later!
+
+4. **Initialize Database Schema**
+   - Go to "SQL Editor" in Supabase dashboard
+   - Copy the schema from `server/db.js` (the CREATE TABLE statements)
+   - Or run migrations locally:
+     ```bash
+     # Set DATABASE_URL to your Supabase connection string
+     export DATABASE_URL="your-supabase-connection-string"
+     npm run migrate
+     ```
+
+### Step 2: Deploy to Vercel
+
+1. **Push Code to GitHub** (if not already done)
+   ```bash
+   git add .
+   git commit -m "Prepare for Vercel deployment"
+   git push
+   ```
+
+2. **Go to Vercel**
+   - Visit [vercel.com](https://vercel.com)
+   - Click "Sign Up" or "Login" with GitHub (free, no credit card)
+
+3. **Import Your Repository**
+   - Click "Add New..." → "Project"
+   - Import your GitHub repository: `hairyone/job-search`
+   - Click "Import"
+
+4. **Configure Project**
+   - Framework Preset: Vercel auto-detects (leave as is)
+   - Root Directory: `./` (leave default)
+   - Build & Development Settings: Use defaults
+   - Click "Deploy"
+
+5. **Add Environment Variables**
+   
+   While it's building, click "Environment Variables" and add:
+   
+   | Name | Value |
+   |------|-------|
+   | `DATABASE_URL` | Your Supabase connection string |
+   | `NODE_ENV` | `production` |
+   | `AUTH_USERNAME` | Your chosen username |
+   | `AUTH_PASSWORD` | Your chosen password |
+   
+   Then redeploy if already deployed.
+
+6. **Access Your App**
+   - Vercel gives you a URL like: `https://job-search-xyz.vercel.app`
+   - Your app is live and FREE forever! 🎉
+
+### Step 3: Migrate Data from Railway (If Applicable)
+
+If you already have data in Railway, see [MIGRATION.md](MIGRATION.md) for detailed instructions.
+
+**Quick version:**
+```bash
+# Export from Railway
+pg_dump "$RAILWAY_DATABASE_URL" --clean --no-owner --no-acl -f backup.sql
+
+# Import to Supabase
+psql "$SUPABASE_DATABASE_URL" -f backup.sql
+```
+
+### Vercel + Supabase Benefits
+
+- ✅ **$0/month** - completely free for personal projects
+- ✅ **No credit card required**
+- ✅ **No sleep mode** - always fast
+- ✅ **Automatic deployments** - push to GitHub, auto-deploy
+- ✅ **Global CDN** - fast worldwide
+- ✅ **500MB database** - plenty for job tracking
+- ✅ **SSL/HTTPS included**
+- ✅ **99.9% uptime**
+
+### Free Tier Limits
+
+**Vercel:**
+- 100GB bandwidth/month
+- Unlimited websites
+- 100GB-hours serverless function execution
+
+**Supabase:**
+- 500MB database storage
+- 2GB bandwidth/month
+- Unlimited API requests
+- 500MB file storage
+
+**This is more than enough for personal job tracking!**
+
+---
+
 ## Deploy to Railway ($5/month Hosting)
+
+### Alternative: Paid hosting with simpler setup
+
+**Total Cost: $5-8/month** 💳
 
 ### Quick Deployment
 
