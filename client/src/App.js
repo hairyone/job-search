@@ -142,30 +142,25 @@ function App() {
         </aside>
 
         <main className={`content ${!showMobileList ? 'show-mobile' : 'hide-mobile'}`}>
+          {(showForm || selectedJob) && (
+            <button className="back-button mobile-only" onClick={handleBackToList}>
+              ← Back
+            </button>
+          )}
           {showForm ? (
-            <>
-              <button className="back-button mobile-only" onClick={handleBackToList}>
-                ← Back to List
-              </button>
-              <JobForm
-                job={editingJob}
-                onSave={handleSaveJob}
-                onCancel={() => setShowForm(false)}
-              />
-            </>
+            <JobForm
+              job={editingJob}
+              onSave={handleSaveJob}
+              onCancel={() => setShowForm(false)}
+            />
           ) : selectedJob ? (
-            <>
-              <button className="back-button mobile-only" onClick={handleBackToList}>
-                ← Back to List
-              </button>
-              <JobDetails
-                job={selectedJob}
-                onEdit={() => handleEditJob(selectedJob)}
-                onDelete={() => handleDeleteJob(selectedJob.id)}
-                onAddAttachment={handleAddAttachment}
-                onDeleteAttachment={handleDeleteAttachment}
-              />
-            </>
+            <JobDetails
+              job={selectedJob}
+              onEdit={() => handleEditJob(selectedJob)}
+              onDelete={() => handleDeleteJob(selectedJob.id)}
+              onAddAttachment={handleAddAttachment}
+              onDeleteAttachment={handleDeleteAttachment}
+            />
           ) : (
             <div className="empty-state">
               <h2>Welcome to Job Application Tracker</h2>
