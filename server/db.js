@@ -10,12 +10,26 @@ if (!process.env.DATABASE_URL) {
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+  // Add connection pool settings for Vercel
+  max: 1,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 5000,
+});
+
+// Log connection errors
+pool.on('error', (err) => {
+  console.error('Unexpected error on idle client', err);
 });
 
 const initialize = async () => {
   const client = await pool.connect();
   try {
+    // Test connection first
+    console.log('Testing database connection...');
+    await client.query('SELECT NOW()');
+    console.log('Database connection successful');
+    
     // Create tables (without strict constraints that might need updates)
     await client.query(`
       CREATE TABLE IF NOT EXISTS jobs (
