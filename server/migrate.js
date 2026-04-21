@@ -1,16 +1,7 @@
 require('dotenv').config();
-const { Pool } = require('pg');
+const pool = require('./pool');
 const fs = require('fs');
 const path = require('path');
-
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
-  // Connection pool settings
-  max: 1,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 5000,
-});
 
 const runMigrations = async () => {
   const client = await pool.connect();

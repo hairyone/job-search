@@ -50,22 +50,30 @@ app.get('*', (req, res) => {
 
 // Initialize database
 let dbInitialized = false;
-let dbInitializationError = null;
+let dbInitPromise = null;
 
 async function initializeDatabase() {
-  if (!dbInitialized && !dbInitializationError) {
-    try {
-      await db.initialize();
-      dbInitialized = true;
-    } catch (error) {
-      console.error('Database initialization error:', error);
-      dbInitializationError = error;
-      throw error;
-    }
+  // Return existing promise if initialization is in progress
+  if (dbInitPromise) {
+    return dbInitPromise;
   }
-  if (dbInitializationError) {
-    throw dbInitializationError;
+  
+  if (!dbInitialized) {
+    dbInitPromise = db.initialize()
+      .then(() => {
+        dbInitialized = true;
+        return true;
+      })
+      .catch((error) => {
+        console.error('Database initialization error:', error);
+        dbInitPromise = null; // Reset promise so we can retry
+        throw error;
+      });
+    
+    return dbInitPromise;
   }
+  
+  return true;
 }
 
 // For Vercel serverless

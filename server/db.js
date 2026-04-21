@@ -1,26 +1,6 @@
 require('dotenv').config();
-const { Pool } = require('pg');
+const pool = require('./pool');
 const { runMigrations } = require('./migrate');
-
-if (!process.env.DATABASE_URL) {
-  console.error('ERROR: DATABASE_URL environment variable is not set.');
-  console.error('Set DATABASE_URL to the connection string for your PostgreSQL database.');
-  process.exit(1);
-}
-
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
-  // Add connection pool settings for Vercel
-  max: 1,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 5000,
-});
-
-// Log connection errors
-pool.on('error', (err) => {
-  console.error('Unexpected error on idle client', err);
-});
 
 const initialize = async () => {
   const client = await pool.connect();
@@ -109,6 +89,24 @@ const initialize = async () => {
     await client.query(`
       CREATE INDEX IF NOT EXISTS idx_attachments_job_id ON attachments(job_id);
     `);
+
+    console.log('Database initialized successfully');
+    
+    // Run migrations after initial setup
+    await runMigrations();
+  } catch (error) {
+    console.error('Database initialization error:', error);
+    throw error;
+  } finally {
+    client.release();
+  }
+};
+
+module.exports = {
+  query: (text, params) => pool.query(text, params),
+  initialize,
+  pool
+};
 
     console.log('Database initialized successfully');
     
