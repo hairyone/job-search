@@ -3,11 +3,11 @@ const pool = require('./pool');
 const { runMigrations } = require('./migrate');
 
 const initialize = async () => {
-  const client = await pool.connect();
+  let client;
   try {
     // Test connection first
     console.log('Testing database connection...');
-    await client.query('SELECT NOW()');
+    client = await pool.connect();
     console.log('Database connection successful');
     
     // Create tables (without strict constraints that might need updates)
@@ -95,10 +95,14 @@ const initialize = async () => {
     // Run migrations after initial setup
     await runMigrations();
   } catch (error) {
-    console.error('Database initialization error:', error);
+    console.error('Database initialization error:', error.message);
+    console.error('Error code:', error.code);
+    console.error('Error details:', error);
     throw error;
   } finally {
-    client.release();
+    if (client) {
+      client.release();
+    }
   }
 };
 

@@ -6,6 +6,7 @@ const path = require('path');
 const runMigrations = async () => {
   const client = await pool.connect();
   try {
+    console.log('Starting migrations...');
     // Create migrations table if it doesn't exist
     await client.query(`
       CREATE TABLE IF NOT EXISTS migrations (
@@ -52,10 +53,12 @@ const runMigrations = async () => {
 
     console.log('All migrations completed');
   } catch (error) {
-    console.error('Migration error:', error);
+    console.error('Migration error:', error.message);
     throw error;
   } finally {
-    client.release();
+    if (client) {
+      client.release();
+    }
   }
 };
 
