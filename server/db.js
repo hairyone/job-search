@@ -107,21 +107,3 @@ module.exports = {
   initialize,
   pool
 };
-
-    console.log('Database initialized successfully');
-    
-    // Run migrations after initial setup
-    await runMigrations();
-  } catch (error) {
-    console.error('Database initialization error:', error);
-    throw error;
-  } finally {
-    client.release();
-  }
-};
-
-module.exports = {
-  query: (text, params) => pool.query(text, params),
-  initialize,
-  pool
-};
