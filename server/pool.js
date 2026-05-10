@@ -20,8 +20,7 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   // Only use SSL for remote databases (not localhost or Docker containers)
   ssl: isLocalDatabase ? false : { rejectUnauthorized: false },
-  // Vercel serverless: minimal connections
-  max: 1,
+  max: 10,
   min: 0,
   idleTimeoutMillis: 10000,
   connectionTimeoutMillis: 10000,  // Increased from 5000

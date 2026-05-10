@@ -9,7 +9,7 @@ const initialize = async () => {
     console.log('Testing database connection...');
     client = await pool.connect();
     console.log('Database connection successful');
-    
+
     // Create tables (without strict constraints that might need updates)
     await client.query(`
       CREATE TABLE IF NOT EXISTS jobs (
@@ -36,7 +36,7 @@ const initialize = async () => {
         IF NOT EXISTS (
           SELECT 1 FROM pg_constraint WHERE conname = 'jobs_source_check'
         ) THEN
-          ALTER TABLE jobs ADD CONSTRAINT jobs_source_check 
+          ALTER TABLE jobs ADD CONSTRAINT jobs_source_check
             CHECK (source IN ('Indeed', 'LinkedIn', 'Other'));
         END IF;
       END $$;
@@ -48,7 +48,7 @@ const initialize = async () => {
         IF NOT EXISTS (
           SELECT 1 FROM pg_constraint WHERE conname = 'jobs_status_check'
         ) THEN
-          ALTER TABLE jobs ADD CONSTRAINT jobs_status_check 
+          ALTER TABLE jobs ADD CONSTRAINT jobs_status_check
             CHECK (status IN ('Saved', 'Applied', 'Interview Scheduled', 'Interviewed', 'Offer', 'Rejected', 'Declined', 'Accepted', 'No Response', 'Applications Closed'));
         END IF;
       END $$;
@@ -91,9 +91,6 @@ const initialize = async () => {
     `);
 
     console.log('Database initialized successfully');
-    
-    // Run migrations after initial setup
-    await runMigrations();
   } catch (error) {
     console.error('Database initialization error:', error.message);
     console.error('Error code:', error.code);
@@ -104,6 +101,9 @@ const initialize = async () => {
       client.release();
     }
   }
+
+  // Run migrations after connection is released (avoids pool deadlock with max=1)
+  await runMigrations();
 };
 
 module.exports = {

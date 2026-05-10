@@ -1,12 +1,21 @@
 import React, { useState } from 'react';
 import './JobDetails.css';
 
-function JobDetails({ job, onEdit, onDelete, onAddAttachment, onDeleteAttachment }) {
+function JobDetails({ job, onEdit, onDelete, onAddAttachment, onDeleteAttachment, onAddContact, onUpdateContact, onDeleteContact }) {
   const [showAttachmentForm, setShowAttachmentForm] = useState(false);
   const [attachmentData, setAttachmentData] = useState({
     file_name: '',
     google_drive_url: '',
     file_type: ''
+  });
+  const [showContactForm, setShowContactForm] = useState(false);
+  const [editingContact, setEditingContact] = useState(null);
+  const [contactData, setContactData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    position: '',
+    notes: ''
   });
 
   const getStatusColor = (status) => {
@@ -32,6 +41,38 @@ function JobDetails({ job, onEdit, onDelete, onAddAttachment, onDeleteAttachment
       setAttachmentData({ file_name: '', google_drive_url: '', file_type: '' });
       setShowAttachmentForm(false);
     }
+  };
+
+  const handleAddContact = (e) => {
+    e.preventDefault();
+    if (contactData.name) {
+      if (editingContact) {
+        onUpdateContact(editingContact.id, contactData);
+      } else {
+        onAddContact(contactData);
+      }
+      setContactData({ name: '', email: '', phone: '', position: '', notes: '' });
+      setShowContactForm(false);
+      setEditingContact(null);
+    }
+  };
+
+  const handleEditContact = (contact) => {
+    setEditingContact(contact);
+    setContactData({
+      name: contact.name,
+      email: contact.email || '',
+      phone: contact.phone || '',
+      position: contact.position || '',
+      notes: contact.notes || ''
+    });
+    setShowContactForm(true);
+  };
+
+  const handleCancelContact = () => {
+    setContactData({ name: '', email: '', phone: '', position: '', notes: '' });
+    setShowContactForm(false);
+    setEditingContact(null);
   };
 
   return (
@@ -201,6 +242,117 @@ function JobDetails({ job, onEdit, onDelete, onAddAttachment, onDeleteAttachment
             ) : (
               <div className="no-attachments">
                 No attachments yet. Add links to your resume, cover letter, or other documents from Google Drive.
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="detail-card">
+          <div className="section-header">
+            <h3 className="section-title">Contacts ({job.contacts?.length || 0})</h3>
+            <button
+              className="btn btn-primary btn-small"
+              onClick={() => setShowContactForm(!showContactForm)}
+            >
+              {showContactForm ? '✕ Cancel' : '+ Add Contact'}
+            </button>
+          </div>
+
+          {showContactForm && (
+            <form onSubmit={handleAddContact} className="attachment-form">
+              <div className="form-group">
+                <label>Name *</label>
+                <input
+                  type="text"
+                  value={contactData.name}
+                  onChange={(e) => setContactData({ ...contactData, name: e.target.value })}
+                  placeholder="e.g., John Smith"
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label>Position</label>
+                <input
+                  type="text"
+                  value={contactData.position}
+                  onChange={(e) => setContactData({ ...contactData, position: e.target.value })}
+                  placeholder="e.g., HR Manager"
+                />
+              </div>
+              <div className="form-group">
+                <label>Email</label>
+                <input
+                  type="email"
+                  value={contactData.email}
+                  onChange={(e) => setContactData({ ...contactData, email: e.target.value })}
+                  placeholder="e.g., john@company.com"
+                />
+              </div>
+              <div className="form-group">
+                <label>Phone</label>
+                <input
+                  type="text"
+                  value={contactData.phone}
+                  onChange={(e) => setContactData({ ...contactData, phone: e.target.value })}
+                  placeholder="e.g., (555) 123-4567"
+                />
+              </div>
+              <div className="form-group">
+                <label>Notes</label>
+                <textarea
+                  value={contactData.notes}
+                  onChange={(e) => setContactData({ ...contactData, notes: e.target.value })}
+                  placeholder="Add any notes about this contact..."
+                  rows={2}
+                />
+              </div>
+              <button type="submit" className="btn btn-success">
+                {editingContact ? 'Update Contact' : 'Save Contact'}
+              </button>
+            </form>
+          )}
+
+          <div className="attachments-list">
+            {job.contacts && job.contacts.length > 0 ? (
+              job.contacts.map((contact) => (
+                <div key={contact.id} className="attachment-item">
+                  <div className="attachment-info">
+                    <span className="attachment-icon">👤</span>
+                    <div>
+                      <div className="attachment-name">{contact.name}</div>
+                      {contact.position && (
+                        <div className="attachment-type">{contact.position}</div>
+                      )}
+                      {contact.email && (
+                        <div className="contact-email">{contact.email}</div>
+                      )}
+                      {contact.phone && (
+                        <div className="contact-phone">{contact.phone}</div>
+                      )}
+                      {contact.notes && (
+                        <div className="contact-notes">{contact.notes}</div>
+                      )}
+                    </div>
+                  </div>
+                  <div className="attachment-actions">
+                    <button
+                      className="btn-link"
+                      onClick={() => handleEditContact(contact)}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className="btn-link danger"
+                      onClick={() => onDeleteContact(contact.id)}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="no-attachments">
+                No contacts yet. Add people you've met at this company.
               </div>
             )}
           </div>

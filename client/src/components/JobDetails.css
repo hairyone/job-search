@@ -144,6 +144,33 @@
   color: #6c757d;
 }
 
+.contact-email,
+.contact-phone {
+  font-size: 0.875rem;
+  color: #6c757d;
+}
+
+.contact-notes {
+  font-size: 0.875rem;
+  color: #495057;
+  margin-top: 0.25rem;
+  font-style: italic;
+}
+
+textarea {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-family: inherit;
+  resize: vertical;
+}
+
+textarea:focus {
+  outline: none;
+  border-color: #0066cc;
+}
+
 .attachment-actions {
   display: flex;
   gap: 1rem;

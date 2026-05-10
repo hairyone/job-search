@@ -53,6 +53,22 @@ const api = {
   deleteAttachment: async (id) => {
     const response = await axios.delete(`${API_URL}/attachments/${id}`);
     return response.data;
+  },
+
+  // Contacts
+  createContact: async (jobId, contactData) => {
+    const response = await axios.post(`${API_URL}/jobs/${jobId}/contacts`, contactData);
+    return response.data;
+  },
+
+  updateContact: async (contactId, contactData) => {
+    const response = await axios.put(`${API_URL}/jobs/contacts/${contactId}`, contactData);
+    return response.data;
+  },
+
+  deleteContact: async (contactId) => {
+    const response = await axios.delete(`${API_URL}/jobs/contacts/${contactId}`);
+    return response.data;
   }
 };
 

@@ -126,6 +126,39 @@ function App() {
     }
   };
 
+  const handleAddContact = async (contactData) => {
+    try {
+      await api.createContact(selectedJob.id, contactData);
+      const updatedJob = await api.getJob(selectedJob.id);
+      setSelectedJob(updatedJob);
+    } catch (error) {
+      console.error('Failed to add contact:', error);
+      alert('Failed to add contact. Please try again.');
+    }
+  };
+
+  const handleUpdateContact = async (contactId, contactData) => {
+    try {
+      await api.updateContact(contactId, contactData);
+      const updatedJob = await api.getJob(selectedJob.id);
+      setSelectedJob(updatedJob);
+    } catch (error) {
+      console.error('Failed to update contact:', error);
+      alert('Failed to update contact. Please try again.');
+    }
+  };
+
+  const handleDeleteContact = async (contactId) => {
+    try {
+      await api.deleteContact(contactId);
+      const updatedJob = await api.getJob(selectedJob.id);
+      setSelectedJob(updatedJob);
+    } catch (error) {
+      console.error('Failed to delete contact:', error);
+      alert('Failed to delete contact. Please try again.');
+    }
+  };
+
   return (
     <div className="app">
       <Header onAddJob={handleAddJob} filters={filters} setFilters={setFilters} />
@@ -160,6 +193,9 @@ function App() {
               onDelete={() => handleDeleteJob(selectedJob.id)}
               onAddAttachment={handleAddAttachment}
               onDeleteAttachment={handleDeleteAttachment}
+              onAddContact={handleAddContact}
+              onUpdateContact={handleUpdateContact}
+              onDeleteContact={handleDeleteContact}
             />
           ) : (
             <div className="empty-state">

@@ -139,7 +139,7 @@ router.delete('/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const result = await db.query('DELETE FROM jobs WHERE id = $1 RETURNING id', [id]);
-    
+
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'Job not found' });
     }
@@ -148,6 +148,72 @@ router.delete('/:id', async (req, res) => {
   } catch (error) {
     console.error('Error deleting job:', error);
     res.status(500).json({ error: 'Failed to delete job' });
+  }
+});
+
+// Create contact
+router.post('/:jobId/contacts', async (req, res) => {
+  try {
+    const { jobId } = req.params;
+    const { name, email, phone, position, notes } = req.body;
+
+    if (!name) {
+      return res.status(400).json({ error: 'Contact name is required' });
+    }
+
+    const result = await db.query(
+      `INSERT INTO contacts (job_id, name, email, phone, position, notes)
+       VALUES ($1, $2, $3, $4, $5, $6)
+       RETURNING *`,
+      [jobId, name, email, phone, position, notes]
+    );
+
+    res.status(201).json(result.rows[0]);
+  } catch (error) {
+    console.error('Error creating contact:', error);
+    res.status(500).json({ error: 'Failed to create contact' });
+  }
+});
+
+// Update contact
+router.put('/contacts/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, email, phone, position, notes } = req.body;
+
+    const result = await db.query(
+      `UPDATE contacts
+       SET name = $1, email = $2, phone = $3, position = $4, notes = $5, updated_at = CURRENT_TIMESTAMP
+       WHERE id = $6
+       RETURNING *`,
+      [name, email, phone, position, notes, id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Contact not found' });
+    }
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error('Error updating contact:', error);
+    res.status(500).json({ error: 'Failed to update contact' });
+  }
+});
+
+// Delete contact
+router.delete('/contacts/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await db.query('DELETE FROM contacts WHERE id = $1 RETURNING id', [id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Contact not found' });
+    }
+
+    res.json({ message: 'Contact deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting contact:', error);
+    res.status(500).json({ error: 'Failed to delete contact' });
   }
 });
 
