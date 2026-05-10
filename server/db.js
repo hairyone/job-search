@@ -1,21 +1,15 @@
 require('dotenv').config();
-const { Pool } = require('pg');
+const pool = require('./pool');
 const { runMigrations } = require('./migrate');
 
-if (!process.env.DATABASE_URL) {
-  console.error('ERROR: DATABASE_URL environment variable is not set.');
-  console.error('Set DATABASE_URL to the connection string for your PostgreSQL database.');
-  process.exit(1);
-}
-
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
-});
-
 const initialize = async () => {
-  const client = await pool.connect();
+  let client;
   try {
+    // Test connection first
+    console.log('Testing database connection...');
+    client = await pool.connect();
+    console.log('Database connection successful');
+    
     // Create tables (without strict constraints that might need updates)
     await client.query(`
       CREATE TABLE IF NOT EXISTS jobs (
@@ -101,10 +95,14 @@ const initialize = async () => {
     // Run migrations after initial setup
     await runMigrations();
   } catch (error) {
-    console.error('Database initialization error:', error);
+    console.error('Database initialization error:', error.message);
+    console.error('Error code:', error.code);
+    console.error('Error details:', error);
     throw error;
   } finally {
-    client.release();
+    if (client) {
+      client.release();
+    }
   }
 };
 

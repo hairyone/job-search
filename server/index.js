@@ -50,19 +50,49 @@ app.get('*', (req, res) => {
 
 // Initialize database
 let dbInitialized = false;
+let dbInitPromise = null;
+
 async function initializeDatabase() {
-  if (!dbInitialized) {
-    await db.initialize();
-    dbInitialized = true;
+  // Return existing promise if initialization is in progress
+  if (dbInitPromise) {
+    return dbInitPromise;
   }
+  
+  if (!dbInitialized) {
+    dbInitPromise = db.initialize()
+      .then(() => {
+        dbInitialized = true;
+        return true;
+      })
+      .catch((error) => {
+        console.error('Database initialization error:', error);
+        dbInitPromise = null; // Reset promise so we can retry
+        throw error;
+      });
+    
+    return dbInitPromise;
+  }
+  
+  return true;
 }
 
 // For Vercel serverless
 if (process.env.VERCEL) {
   // Export the app for Vercel
   module.exports = async (req, res) => {
-    await initializeDatabase();
-    return app(req, res);
+    try {
+      // Skip DB init for health check
+      if (req.path !== '/api/health') {
+        await initializeDatabase();
+      }
+      return app(req, res);
+    } catch (error) {
+      console.error('Serverless function error:', error);
+      res.status(500).json({ 
+        error: 'Internal Server Error',
+        message: error.message 
+      });
+    }
   };
 } else {
   // For local development and Railway
