@@ -8,10 +8,18 @@ if (!process.env.DATABASE_URL) {
 
 console.log('DATABASE_URL is set (length: ' + process.env.DATABASE_URL.length + ')');
 
+// Determine if we should use SSL based on the database host
+const databaseUrl = process.env.DATABASE_URL;
+const isLocalDatabase = databaseUrl.includes('localhost') || 
+                        databaseUrl.includes('127.0.0.1') || 
+                        databaseUrl.includes('@postgres:') ||
+                        databaseUrl.includes('@db:');
+
 // Single shared pool instance
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+  // Only use SSL for remote databases (not localhost or Docker containers)
+  ssl: isLocalDatabase ? false : { rejectUnauthorized: false },
   // Vercel serverless: minimal connections
   max: 1,
   min: 0,
