@@ -2,7 +2,61 @@
 
 A full-stack web application to track job applications from Indeed, LinkedIn, and other sources. Features include progress tracking, Google Drive attachment integration, and comprehensive statistics.
 
-![Job Tracker](https://img.shields.io/badge/Status-Ready%20to%20Deploy-brightgreen)
+![Job Tracker](https://img.shields.io/badge/Status-Ready%20to%20Use-brightgreen)
+
+## ⚡ Quick Start - Run Locally on Your Laptop
+
+**Not sure which setup to use?** See **[WHICH-SETUP.md](WHICH-SETUP.md)** to help you decide!
+
+**Choose your preferred setup:**
+
+### 🐳 Option 1: Everything in Docker (Easiest - No Node.js needed!)
+
+**Just have Docker?** Run everything in containers:
+
+```bash
+docker-compose -f docker-compose.full.yml up -d
+```
+
+Open http://localhost:3000 - Done! 🎉
+
+**Details:** [DOCKER-FULL.md](DOCKER-FULL.md)
+
+### 💻 Option 2: Traditional Development (With Node.js installed)
+
+**Automated Setup:**
+
+**Linux/Mac:**
+```bash
+./start-local.sh
+```
+
+**Windows:**
+```bash
+start-local.bat
+```
+
+**Manual Setup:**
+
+```bash
+# 1. Install dependencies
+npm run install:all
+
+# 2. Start database (using Docker Compose)
+docker-compose up -d
+
+# 3. Create .env file
+cp .env.example .env
+
+# 4. Start the app
+npm run local
+```
+
+Open http://localhost:3000 and you're done! 🎉
+
+**Details:** [LOCAL-SETUP.md](LOCAL-SETUP.md) | [QUICKSTART.md](QUICKSTART.md)
+
+---
 
 ## Features
 
@@ -21,53 +75,65 @@ A full-stack web application to track job applications from Indeed, LinkedIn, an
 - **Frontend**: React 18
 - **Backend**: Node.js + Express
 - **Database**: PostgreSQL
-- **Hosting**: Railway (Hobby plan - $5/month)
+- **Local Hosting**: Docker (recommended) or native PostgreSQL
+- **Cloud Hosting**: Vercel (free) or Railway ($5/month)
 
 ## Local Development
+
+**📖 See [LOCAL-SETUP.md](LOCAL-SETUP.md) for complete instructions with troubleshooting.**
 
 ### Prerequisites
 
 - Node.js 18 or higher
-- PostgreSQL (or use Render's free PostgreSQL)
+- Docker Desktop (easiest) OR native PostgreSQL
 
-### Setup
+### Quick Setup
 
-1. **Clone the repository**
-   ```bash
-   git clone <your-repo-url>
-   cd job-search
-   ```
-
-2. **Install dependencies**
+1. **Install dependencies**
    ```bash
    npm run install:all
    ```
 
-3. **Set up environment variables**
-   
-   Create a `.env` file in the root directory:
+2. **Start local database** (using Docker)
+   ```bash
+   docker run --name job-tracker-db \
+     -e POSTGRES_PASSWORD=password123 \
+     -e POSTGRES_DB=job_tracker \
+     -p 5432:5432 \
+     -d postgres:15
+   ```
+
+3. **Create `.env` file** in the root directory:
    ```env
-   DATABASE_URL=postgresql://user:password@localhost:5432/job_tracker
-   PORT=3000
+   DATABASE_URL=postgresql://postgres:password123@localhost:5432/job_tracker
+   PORT=3001
    NODE_ENV=development
    ```
 
-4. **Run development servers**
-   
-   Backend:
+4. **Start the application**
    ```bash
-   npm run dev
-   ```
-   
-   Frontend (in a new terminal):
-   ```bash
-   cd client
-   npm start
+   npm run local
    ```
 
 5. **Access the application**
    - Frontend: http://localhost:3000
-   - Backend API: http://localhost:3000/api
+   - Backend API: http://localhost:3001/api
+
+The database schema is created automatically on first startup!
+
+### Useful Commands
+
+```bash
+npm run install:all    # Install all dependencies
+npm run local          # Start both frontend and backend
+npm run dev            # Start backend only
+npm run client         # Start frontend only
+npm run build          # Build for production
+```
+
+---
+
+## Cloud Deployment Options
 
 ## Deploy to Vercel + Supabase (FREE Forever!)
 

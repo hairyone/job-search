@@ -6,12 +6,20 @@
   "scripts": {
     "start": "node server/index.js",
     "dev": "nodemon server/index.js",
+    "client": "cd client && npm start",
+    "local": "concurrently \"npm run dev\" \"npm run client\"",
     "build": "npm run build:client",
     "build:client": "cd client && npm install && npm run build",
     "install:all": "npm install && cd client && npm install",
     "railway:build": "npm install && cd client && npm install && npm run build",
     "vercel-build": "cd client && npm install && npm run build",
-    "migrate": "node -e \"require('./server/migrate').runMigrations()\""
+    "migrate": "node -e \"require('./server/migrate').runMigrations()\"",
+    "docker:full": "docker-compose -f docker-compose.full.yml up -d",
+    "docker:full:build": "docker-compose -f docker-compose.full.yml up -d --build",
+    "docker:full:down": "docker-compose -f docker-compose.full.yml down",
+    "docker:full:logs": "docker-compose -f docker-compose.full.yml logs -f",
+    "docker:db": "docker-compose up -d",
+    "docker:db:down": "docker-compose down"
   },
   "keywords": ["job-tracker", "indeed", "linkedin"],
   "author": "",
@@ -27,7 +35,8 @@
     "helmet": "^7.1.0"
   },
   "devDependencies": {
-    "nodemon": "^3.0.1"
+    "nodemon": "^3.0.1",
+    "concurrently": "^8.2.2"
   },
   "engines": {
     "node": ">=18.0.0"

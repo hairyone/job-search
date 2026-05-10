@@ -6,3 +6,6 @@ client/build
 .DS_Store
 credentials.json
 token.json
+
+# Database data (stored on host filesystem)
+data/
