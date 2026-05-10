@@ -6,7 +6,7 @@ FROM node:18-alpine AS builder
 # Build the React frontend
 WORKDIR /app/client
 COPY client/package*.json ./
-RUN npm ci
+RUN npm install
 COPY client/ ./
 RUN npm run build
 
@@ -17,7 +17,7 @@ WORKDIR /app
 
 # Copy backend dependencies and code
 COPY package*.json ./
-RUN npm ci --only=production
+RUN npm install --only=production
 
 # Copy backend code
 COPY server/ ./server/
