@@ -9,3 +9,6 @@ token.json
 
 # Database data (stored on host filesystem)
 data/
+
+# Archived cloud deployment files (not needed for local hosting)
+archived-cloud-files/

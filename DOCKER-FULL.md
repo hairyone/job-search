@@ -290,7 +290,7 @@ This removes all traces of the application from Docker.
 
 ## Next Steps
 
-- **Production deployment?** The same Dockerfile works with Railway, Render, AWS, etc.
+- **Production deployment?** The same Dockerfile works with AWS, Azure, Google Cloud, DigitalOcean, etc.
 - **Need development mode?** Use `docker-compose.yml` (database only) + `npm run local`
 - **Want to customize?** Edit `Dockerfile` and `docker-compose.full.yml`
 

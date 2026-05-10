@@ -94,4 +94,5 @@ docker-compose down
 - Traditional setup: [LOCAL-SETUP.md](LOCAL-SETUP.md)
 
 **Want to deploy to the cloud?** 
-- See [README.md](README.md) for Vercel and Railway deployment options
+- The Docker setup works with any cloud provider (AWS, Azure, Google Cloud, DigitalOcean, etc.)
+- See [README.md](README.md) for deployment information

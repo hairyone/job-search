@@ -163,7 +163,7 @@ npm run build
 ## What Stays the Same
 
 - All existing functionality works as before
-- Cloud deployment options still available (Vercel, Railway, etc.)
+- Can be deployed to any Docker-compatible cloud service
 - No breaking changes to the codebase
 - Existing environment variables still supported
 
@@ -193,13 +193,11 @@ If you encounter issues:
 3. Check that ports 3000, 3001, and 5432 are available
 4. Review `.env` file configuration
 
-## Migration from Cloud to Local
+## Data Privacy
 
-If you were using Railway or Vercel:
+When running locally:
 
-1. Export your data using [MIGRATION.md](MIGRATION.md) instructions
-2. Set up local environment following [LOCAL-SETUP.md](LOCAL-SETUP.md)
-3. Import data to local PostgreSQL database
-4. Start using locally!
-
-Your data stays on your laptop - completely private and under your control.
+- Your data stays on your laptop
+- Completely private and under your control
+- No cloud services required
+- Full ownership of your job search data

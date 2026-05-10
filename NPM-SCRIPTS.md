@@ -61,7 +61,7 @@ npm install
 cd client && npm install
 ```
 
-## Build & Deploy
+## Build
 
 ```bash
 # Build frontend for production
@@ -69,12 +69,6 @@ npm run build
 
 # Build frontend only
 npm run build:client
-
-# Build for Railway (used by Railway.app)
-npm run railway:build
-
-# Build for Vercel (used by Vercel)
-npm run vercel-build
 ```
 
 ## Database
@@ -94,7 +88,7 @@ npm run migrate
 | `npm run docker:full` | Run entire app in Docker |
 | `npm run docker:db` | Run database in Docker only |
 | `npm run install:all` | Install all dependencies |
-| `npm run build` | Build for production |
+| `npm run build` | Build frontend for production |
 | `npm run migrate` | Run database migrations |
 
 ## Common Workflows
