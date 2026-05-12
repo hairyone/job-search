@@ -183,7 +183,7 @@ router.put('/contacts/:id', async (req, res) => {
 
     const result = await db.query(
       `UPDATE contacts
-       SET name = $1, email = $2, phone = $3, position = $4, notes = $5, updated_at = CURRENT_TIMESTAMP
+       SET name = $1, email = $2, phone = $3, position = $4, notes = $5
        WHERE id = $6
        RETURNING *`,
       [name, email, phone, position, notes, id]
