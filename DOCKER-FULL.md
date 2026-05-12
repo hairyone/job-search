@@ -167,12 +167,25 @@ docker stats
 
 ## Updating the Application
 
-After making code changes:
+After making code changes, use this workflow to avoid stale container issues:
 
 ```bash
-# Rebuild and restart
+# Option 1: Full stop before rebuild (recommended)
+docker-compose -f docker-compose.full.yml down
+docker-compose -f docker-compose.full.yml up -d --build
+
+# Option 2: Remove container first, then restart
+docker rm -f job-tracker-app
 docker-compose -f docker-compose.full.yml up -d --build
 ```
+
+### Why the Extra Steps?
+Docker Compose may error with `'ContainerConfig' KeyError` when rebuilding after an image change. This happens because:
+- The old container's metadata doesn't match the new image
+- Volume conflicts between old and new container configs
+- A known bug in docker-compose v1.29.2
+
+**Always `down` before `--build`** to ensure a clean state.
 
 ## Troubleshooting
 
