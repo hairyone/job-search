@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './JobDetails.css';
 
-function JobDetails({ job, onEdit, onDelete, onAddAttachment, onDeleteAttachment, onAddContact, onUpdateContact, onDeleteContact }) {
+function JobDetails({ job, onEdit, onDelete, onAddAttachment, onDeleteAttachment, onAddContact, onUpdateContact, onDeleteContact, onAddJobNote, onUpdateJobNote, onDeleteJobNote }) {
   const [showAttachmentForm, setShowAttachmentForm] = useState(false);
   const [attachmentData, setAttachmentData] = useState({
     file_name: '',
@@ -16,6 +16,12 @@ function JobDetails({ job, onEdit, onDelete, onAddAttachment, onDeleteAttachment
     phone: '',
     position: '',
     notes: ''
+  });
+  const [showJobNoteForm, setShowJobNoteForm] = useState(false);
+  const [editingJobNote, setEditingJobNote] = useState(null);
+  const [jobNoteData, setJobNoteData] = useState({
+    note_date: new Date().toISOString().split('T')[0],
+    note_text: ''
   });
 
   const getStatusColor = (status) => {
@@ -73,6 +79,35 @@ function JobDetails({ job, onEdit, onDelete, onAddAttachment, onDeleteAttachment
     setContactData({ name: '', email: '', phone: '', position: '', notes: '' });
     setShowContactForm(false);
     setEditingContact(null);
+  };
+
+  const handleAddJobNote = (e) => {
+    e.preventDefault();
+    if (jobNoteData.note_date && jobNoteData.note_text) {
+      if (editingJobNote) {
+        onUpdateJobNote(editingJobNote.id, jobNoteData);
+      } else {
+        onAddJobNote(jobNoteData);
+      }
+      setJobNoteData({ note_date: new Date().toISOString().split('T')[0], note_text: '' });
+      setShowJobNoteForm(false);
+      setEditingJobNote(null);
+    }
+  };
+
+  const handleEditJobNote = (note) => {
+    setEditingJobNote(note);
+    setJobNoteData({
+      note_date: note.note_date,
+      note_text: note.note_text
+    });
+    setShowJobNoteForm(true);
+  };
+
+  const handleCancelJobNote = () => {
+    setJobNoteData({ note_date: new Date().toISOString().split('T')[0], note_text: '' });
+    setShowJobNoteForm(false);
+    setEditingJobNote(null);
   };
 
   return (
@@ -159,6 +194,82 @@ function JobDetails({ job, onEdit, onDelete, onAddAttachment, onDeleteAttachment
             <div className="detail-text">{job.notes}</div>
           </div>
         )}
+
+        <div className="detail-card">
+          <div className="section-header">
+            <h3 className="section-title">Dated Notes ({job.job_notes?.length || 0})</h3>
+            <button
+              className="btn btn-primary btn-small"
+              onClick={() => setShowJobNoteForm(!showJobNoteForm)}
+            >
+              {showJobNoteForm ? '✕ Cancel' : '+ Add Note'}
+            </button>
+          </div>
+
+          {showJobNoteForm && (
+            <form onSubmit={handleAddJobNote} className="attachment-form">
+              <div className="form-group">
+                <label>Date *</label>
+                <input
+                  type="date"
+                  value={jobNoteData.note_date}
+                  onChange={(e) => setJobNoteData({ ...jobNoteData, note_date: e.target.value })}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label>Note *</label>
+                <textarea
+                  value={jobNoteData.note_text}
+                  onChange={(e) => setJobNoteData({ ...jobNoteData, note_text: e.target.value })}
+                  placeholder="Add your note..."
+                  rows={3}
+                  required
+                />
+              </div>
+              <button type="submit" className="btn btn-success">
+                {editingJobNote ? 'Update Note' : 'Save Note'}
+              </button>
+            </form>
+          )}
+
+          <div className="job-notes-list">
+            {job.job_notes && job.job_notes.length > 0 ? (
+              job.job_notes.map((note) => (
+                <div key={note.id} className="job-note-item">
+                  <div className="job-note-header">
+                    <span className="job-note-date">
+                      {new Date(note.note_date).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                      })}
+                    </span>
+                    <div className="job-note-actions">
+                      <button
+                        className="btn-link"
+                        onClick={() => handleEditJobNote(note)}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="btn-link danger"
+                        onClick={() => onDeleteJobNote(note.id)}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                  <div className="job-note-text">{note.note_text}</div>
+                </div>
+              ))
+            ) : (
+              <div className="no-attachments">
+                No dated notes yet. Add notes with dates to track your job search progress.
+              </div>
+            )}
+          </div>
+        </div>
 
         <div className="detail-card">
           <div className="section-header">

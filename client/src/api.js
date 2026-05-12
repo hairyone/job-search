@@ -69,6 +69,22 @@ const api = {
   deleteContact: async (contactId) => {
     const response = await axios.delete(`${API_URL}/jobs/contacts/${contactId}`);
     return response.data;
+  },
+
+  // Job Notes
+  createJobNote: async (jobId, noteData) => {
+    const response = await axios.post(`${API_URL}/jobs/${jobId}/job_notes`, noteData);
+    return response.data;
+  },
+
+  updateJobNote: async (noteId, noteData) => {
+    const response = await axios.put(`${API_URL}/jobs/job_notes/${noteId}`, noteData);
+    return response.data;
+  },
+
+  deleteJobNote: async (noteId) => {
+    const response = await axios.delete(`${API_URL}/jobs/job_notes/${noteId}`);
+    return response.data;
   }
 };
 

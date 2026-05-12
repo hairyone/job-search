@@ -159,6 +159,39 @@ function App() {
     }
   };
 
+  const handleAddJobNote = async (noteData) => {
+    try {
+      await api.createJobNote(selectedJob.id, noteData);
+      const updatedJob = await api.getJob(selectedJob.id);
+      setSelectedJob(updatedJob);
+    } catch (error) {
+      console.error('Failed to add job note:', error);
+      alert('Failed to add job note. Please try again.');
+    }
+  };
+
+  const handleUpdateJobNote = async (noteId, noteData) => {
+    try {
+      await api.updateJobNote(noteId, noteData);
+      const updatedJob = await api.getJob(selectedJob.id);
+      setSelectedJob(updatedJob);
+    } catch (error) {
+      console.error('Failed to update job note:', error);
+      alert('Failed to update job note. Please try again.');
+    }
+  };
+
+  const handleDeleteJobNote = async (noteId) => {
+    try {
+      await api.deleteJobNote(noteId);
+      const updatedJob = await api.getJob(selectedJob.id);
+      setSelectedJob(updatedJob);
+    } catch (error) {
+      console.error('Failed to delete job note:', error);
+      alert('Failed to delete job note. Please try again.');
+    }
+  };
+
   return (
     <div className="app">
       <Header onAddJob={handleAddJob} filters={filters} setFilters={setFilters} />
@@ -196,6 +229,9 @@ function App() {
               onAddContact={handleAddContact}
               onUpdateContact={handleUpdateContact}
               onDeleteContact={handleDeleteContact}
+              onAddJobNote={handleAddJobNote}
+              onUpdateJobNote={handleUpdateJobNote}
+              onDeleteJobNote={handleDeleteJobNote}
             />
           ) : (
             <div className="empty-state">

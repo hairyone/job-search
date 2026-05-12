@@ -79,6 +79,20 @@ const initialize = async () => {
       );
     `);
 
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS job_notes (
+        id SERIAL PRIMARY KEY,
+        job_id INTEGER REFERENCES jobs(id) ON DELETE CASCADE,
+        note_date DATE NOT NULL,
+        note_text TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
+    await client.query(`
+      CREATE INDEX IF NOT EXISTS idx_job_notes_job_id ON job_notes(job_id);
+    `);
+
     // Create index for better query performance
     await client.query(`
       CREATE INDEX IF NOT EXISTS idx_jobs_status ON jobs(status);

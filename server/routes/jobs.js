@@ -38,11 +38,11 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Get single job with attachments and contacts
+// Get single job with attachments, contacts, and job_notes
 router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     const jobResult = await db.query('SELECT * FROM jobs WHERE id = $1', [id]);
     if (jobResult.rows.length === 0) {
       return res.status(404).json({ error: 'Job not found' });
@@ -50,11 +50,13 @@ router.get('/:id', async (req, res) => {
 
     const attachmentsResult = await db.query('SELECT * FROM attachments WHERE job_id = $1', [id]);
     const contactsResult = await db.query('SELECT * FROM contacts WHERE job_id = $1', [id]);
+    const jobNotesResult = await db.query('SELECT * FROM job_notes WHERE job_id = $1 ORDER BY note_date DESC', [id]);
 
     res.json({
       ...jobResult.rows[0],
       attachments: attachmentsResult.rows,
-      contacts: contactsResult.rows
+      contacts: contactsResult.rows,
+      job_notes: jobNotesResult.rows
     });
   } catch (error) {
     console.error('Error fetching job:', error);
@@ -214,6 +216,72 @@ router.delete('/contacts/:id', async (req, res) => {
   } catch (error) {
     console.error('Error deleting contact:', error);
     res.status(500).json({ error: 'Failed to delete contact' });
+  }
+});
+
+// Create job note
+router.post('/:jobId/job_notes', async (req, res) => {
+  try {
+    const { jobId } = req.params;
+    const { note_date, note_text } = req.body;
+
+    if (!note_date || !note_text) {
+      return res.status(400).json({ error: 'Note date and text are required' });
+    }
+
+    const result = await db.query(
+      `INSERT INTO job_notes (job_id, note_date, note_text)
+       VALUES ($1, $2, $3)
+       RETURNING *`,
+      [jobId, note_date, note_text]
+    );
+
+    res.status(201).json(result.rows[0]);
+  } catch (error) {
+    console.error('Error creating job note:', error);
+    res.status(500).json({ error: 'Failed to create job note' });
+  }
+});
+
+// Update job note
+router.put('/job_notes/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { note_date, note_text } = req.body;
+
+    const result = await db.query(
+      `UPDATE job_notes
+       SET note_date = $1, note_text = $2
+       WHERE id = $3
+       RETURNING *`,
+      [note_date, note_text, id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Job note not found' });
+    }
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error('Error updating job note:', error);
+    res.status(500).json({ error: 'Failed to update job note' });
+  }
+});
+
+// Delete job note
+router.delete('/job_notes/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await db.query('DELETE FROM job_notes WHERE id = $1 RETURNING id', [id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Job note not found' });
+    }
+
+    res.json({ message: 'Job note deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting job note:', error);
+    res.status(500).json({ error: 'Failed to delete job note' });
   }
 });
 
