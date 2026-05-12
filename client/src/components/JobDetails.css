@@ -181,11 +181,16 @@
   .contact-item .attachment-info {
     flex-direction: column;
     align-items: flex-start;
+    text-align: left;
   }
 
   .contact-item .attachment-actions {
     margin-top: 0.75rem;
     align-self: flex-start;
+  }
+
+  .contact-details {
+    text-align: left;
   }
 }
 
