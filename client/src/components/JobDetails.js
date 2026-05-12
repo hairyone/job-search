@@ -315,10 +315,10 @@ function JobDetails({ job, onEdit, onDelete, onAddAttachment, onDeleteAttachment
           <div className="attachments-list">
             {job.contacts && job.contacts.length > 0 ? (
               job.contacts.map((contact) => (
-                <div key={contact.id} className="attachment-item">
+                <div key={contact.id} className="attachment-item contact-item">
                   <div className="attachment-info">
                     <span className="attachment-icon">👤</span>
-                    <div>
+                    <div className="contact-details">
                       <div className="attachment-name">{contact.name}</div>
                       {contact.position && (
                         <div className="attachment-type">{contact.position}</div>
@@ -332,21 +332,21 @@ function JobDetails({ job, onEdit, onDelete, onAddAttachment, onDeleteAttachment
                       {contact.notes && (
                         <div className="contact-notes">{contact.notes}</div>
                       )}
+                      <div className="contact-actions">
+                        <button
+                          className="btn-link"
+                          onClick={() => handleEditContact(contact)}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          className="btn-link danger"
+                          onClick={() => onDeleteContact(contact.id)}
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                  <div className="attachment-actions">
-                    <button
-                      className="btn-link"
-                      onClick={() => handleEditContact(contact)}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      className="btn-link danger"
-                      onClick={() => onDeleteContact(contact.id)}
-                    >
-                      Delete
-                    </button>
                   </div>
                 </div>
               ))
