@@ -188,13 +188,6 @@ function JobDetails({ job, onEdit, onDelete, onAddAttachment, onDeleteAttachment
           </div>
         )}
 
-        {job.notes && (
-          <div className="detail-card">
-            <h3 className="section-title">Notes</h3>
-            <div className="detail-text">{job.notes}</div>
-          </div>
-        )}
-
         <div className="detail-card">
           <div className="section-header">
             <h3 className="section-title">Dated Notes ({job.job_notes?.length || 0})</h3>

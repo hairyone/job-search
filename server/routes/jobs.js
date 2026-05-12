@@ -76,7 +76,6 @@ router.post('/', async (req, res) => {
       location,
       salary_range,
       description,
-      notes,
       applied_date
     } = req.body;
 
@@ -85,10 +84,10 @@ router.post('/', async (req, res) => {
     }
 
     const result = await db.query(
-      `INSERT INTO jobs (company, position, source, status, job_url, location, salary_range, description, notes, applied_date)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+      `INSERT INTO jobs (company, position, source, status, job_url, location, salary_range, description, applied_date)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
        RETURNING *`,
-      [company, position, source, status || 'Applied', job_url, location, salary_range, description, notes, applied_date]
+      [company, position, source, status || 'Applied', job_url, location, salary_range, description, applied_date]
     );
 
     res.status(201).json(result.rows[0]);
@@ -111,18 +110,17 @@ router.put('/:id', async (req, res) => {
       location,
       salary_range,
       description,
-      notes,
       applied_date
     } = req.body;
 
     const result = await db.query(
-      `UPDATE jobs 
-       SET company = $1, position = $2, source = $3, status = $4, job_url = $5, 
-           location = $6, salary_range = $7, description = $8, notes = $9, 
-           applied_date = $10, updated_at = CURRENT_TIMESTAMP
-       WHERE id = $11
+      `UPDATE jobs
+       SET company = $1, position = $2, source = $3, status = $4, job_url = $5,
+           location = $6, salary_range = $7, description = $8,
+           applied_date = $9, updated_at = CURRENT_TIMESTAMP
+       WHERE id = $10
        RETURNING *`,
-      [company, position, source, status, job_url, location, salary_range, description, notes, applied_date, id]
+      [company, position, source, status, job_url, location, salary_range, description, applied_date, id]
     );
 
     if (result.rows.length === 0) {

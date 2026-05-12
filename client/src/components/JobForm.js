@@ -11,7 +11,6 @@ function JobForm({ job, onSave, onCancel }) {
     location: job?.location || '',
     salary_range: job?.salary_range || '',
     description: job?.description || '',
-    notes: job?.notes || '',
     applied_date: job?.applied_date ? job.applied_date.split('T')[0] : new Date().toISOString().split('T')[0]
   });
 
@@ -138,17 +137,6 @@ function JobForm({ job, onSave, onCancel }) {
             onChange={handleChange}
             placeholder="Paste job description here..."
             rows="6"
-          />
-        </div>
-
-        <div className="form-group">
-          <label>Notes</label>
-          <textarea
-            name="notes"
-            value={formData.notes}
-            onChange={handleChange}
-            placeholder="Any additional notes..."
-            rows="4"
           />
         </div>
 
