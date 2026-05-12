@@ -23,7 +23,12 @@ function JobDetails({ job, onEdit, onDelete, onAddAttachment, onDeleteAttachment
     note_date: new Date().toISOString().split('T')[0],
     note_text: ''
   });
-  const [collapsed, setCollapsed] = useState({});
+  const [collapsed, setCollapsed] = useState({
+    description: true,
+    notes: true,
+    attachments: true,
+    contacts: true
+  });
 
   const getStatusColor = (status) => {
     const colors = {
@@ -98,8 +103,11 @@ function JobDetails({ job, onEdit, onDelete, onAddAttachment, onDeleteAttachment
 
   const handleEditJobNote = (note) => {
     setEditingJobNote(note);
+    const noteDate = note.note_date instanceof Date
+      ? note.note_date.toISOString().split('T')[0]
+      : new Date(note.note_date).toISOString().split('T')[0];
     setJobNoteData({
-      note_date: note.note_date,
+      note_date: noteDate,
       note_text: note.note_text
     });
     setShowJobNoteForm(true);
