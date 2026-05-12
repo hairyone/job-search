@@ -23,6 +23,7 @@ function JobDetails({ job, onEdit, onDelete, onAddAttachment, onDeleteAttachment
     note_date: new Date().toISOString().split('T')[0],
     note_text: ''
   });
+  const [collapsed, setCollapsed] = useState({});
 
   const getStatusColor = (status) => {
     const colors = {
@@ -110,6 +111,10 @@ function JobDetails({ job, onEdit, onDelete, onAddAttachment, onDeleteAttachment
     setEditingJobNote(null);
   };
 
+  const toggleSection = (section) => {
+    setCollapsed(prev => ({ ...prev, [section]: !prev[section] }));
+  };
+
   return (
     <div className="job-details-container">
       <div className="job-details-header">
@@ -182,21 +187,27 @@ function JobDetails({ job, onEdit, onDelete, onAddAttachment, onDeleteAttachment
         </div>
 
         {job.description && (
-          <div className="detail-card">
-            <h3 className="section-title">Job Description</h3>
-            <div className="detail-text">{job.description}</div>
+          <div className="detail-card collapsible">
+            <div className="collapsible-header" onClick={() => toggleSection('description')}>
+              <h3 className="section-title">Job Description</h3>
+              <span className="collapse-icon">{collapsed.description ? '▼' : '▲'}</span>
+            </div>
+            {!collapsed.description && <div className="detail-text">{job.description}</div>}
           </div>
         )}
 
-        <div className="detail-card">
-          <div className="section-header">
+        <div className="detail-card collapsible">
+          <div className="section-header collapsible-header" onClick={() => toggleSection('notes')}>
             <h3 className="section-title">Dated Notes ({job.job_notes?.length || 0})</h3>
-            <button
-              className="btn btn-primary btn-small"
-              onClick={() => setShowJobNoteForm(!showJobNoteForm)}
-            >
-              {showJobNoteForm ? '✕ Cancel' : '+ Add Note'}
-            </button>
+            <div className="header-right">
+              <button
+                className="btn btn-primary btn-small"
+                onClick={(e) => { e.stopPropagation(); setShowJobNoteForm(!showJobNoteForm); }}
+              >
+                {showJobNoteForm ? '✕ Cancel' : '+ Add Note'}
+              </button>
+              <span className="collapse-icon">{collapsed.notes ? '▼' : '▲'}</span>
+            </div>
           </div>
 
           {showJobNoteForm && (
@@ -226,53 +237,58 @@ function JobDetails({ job, onEdit, onDelete, onAddAttachment, onDeleteAttachment
             </form>
           )}
 
-          <div className="job-notes-list">
-            {job.job_notes && job.job_notes.length > 0 ? (
-              job.job_notes.map((note) => (
-                <div key={note.id} className="job-note-item">
-                  <div className="job-note-header">
-                    <span className="job-note-date">
-                      {new Date(note.note_date).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric'
-                      })}
-                    </span>
-                    <div className="job-note-actions">
-                      <button
-                        className="btn-link"
-                        onClick={() => handleEditJobNote(note)}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        className="btn-link danger"
-                        onClick={() => onDeleteJobNote(note.id)}
-                      >
-                        Delete
-                      </button>
+          {!collapsed.notes && (
+            <div className="job-notes-list">
+              {job.job_notes && job.job_notes.length > 0 ? (
+                job.job_notes.map((note) => (
+                  <div key={note.id} className="job-note-item">
+                    <div className="job-note-header">
+                      <span className="job-note-date">
+                        {new Date(note.note_date).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric'
+                        })}
+                      </span>
+                      <div className="job-note-actions">
+                        <button
+                          className="btn-link"
+                          onClick={() => handleEditJobNote(note)}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          className="btn-link danger"
+                          onClick={() => onDeleteJobNote(note.id)}
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </div>
+                    <div className="job-note-text">{note.note_text}</div>
                   </div>
-                  <div className="job-note-text">{note.note_text}</div>
+                ))
+              ) : (
+                <div className="no-attachments">
+                  No dated notes yet. Add notes with dates to track your job search progress.
                 </div>
-              ))
-            ) : (
-              <div className="no-attachments">
-                No dated notes yet. Add notes with dates to track your job search progress.
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
         </div>
 
-        <div className="detail-card">
-          <div className="section-header">
+        <div className="detail-card collapsible">
+          <div className="section-header collapsible-header" onClick={() => toggleSection('attachments')}>
             <h3 className="section-title">Attachments ({job.attachments?.length || 0})</h3>
-            <button
-              className="btn btn-primary btn-small"
-              onClick={() => setShowAttachmentForm(!showAttachmentForm)}
-            >
-              {showAttachmentForm ? '✕ Cancel' : '+ Add Attachment'}
-            </button>
+            <div className="header-right">
+              <button
+                className="btn btn-primary btn-small"
+                onClick={(e) => { e.stopPropagation(); setShowAttachmentForm(!showAttachmentForm); }}
+              >
+                {showAttachmentForm ? '✕ Cancel' : '+ Add Attachment'}
+              </button>
+              <span className="collapse-icon">{collapsed.attachments ? '▼' : '▲'}</span>
+            </div>
           </div>
 
           {showAttachmentForm && (
@@ -310,56 +326,61 @@ function JobDetails({ job, onEdit, onDelete, onAddAttachment, onDeleteAttachment
             </form>
           )}
 
-          <div className="attachments-list">
-            {job.attachments && job.attachments.length > 0 ? (
-              job.attachments.map((attachment) => (
-                <div key={attachment.id} className="attachment-item">
-                  <div className="attachment-info">
-                    <span className="attachment-icon">📎</span>
-                    <div>
-                      <div className="attachment-name">{attachment.file_name}</div>
-                      {attachment.file_type && (
-                        <div className="attachment-type">{attachment.file_type}</div>
+          {!collapsed.attachments && (
+            <div className="attachments-list">
+              {job.attachments && job.attachments.length > 0 ? (
+                job.attachments.map((attachment) => (
+                  <div key={attachment.id} className="attachment-item">
+                    <div className="attachment-info">
+                      <span className="attachment-icon">📎</span>
+                      <div>
+                        <div className="attachment-name">{attachment.file_name}</div>
+                        {attachment.file_type && (
+                          <div className="attachment-type">{attachment.file_type}</div>
+                        )}
+                      </div>
+                    </div>
+                    <div className="attachment-actions">
+                      {attachment.google_drive_url && (
+                        <a
+                          href={attachment.google_drive_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="btn-link"
+                        >
+                          Open
+                        </a>
                       )}
+                      <button
+                        className="btn-link danger"
+                        onClick={() => onDeleteAttachment(attachment.id)}
+                      >
+                        Delete
+                      </button>
                     </div>
                   </div>
-                  <div className="attachment-actions">
-                    {attachment.google_drive_url && (
-                      <a
-                        href={attachment.google_drive_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="btn-link"
-                      >
-                        Open
-                      </a>
-                    )}
-                    <button
-                      className="btn-link danger"
-                      onClick={() => onDeleteAttachment(attachment.id)}
-                    >
-                      Delete
-                    </button>
-                  </div>
+                ))
+              ) : (
+                <div className="no-attachments">
+                  No attachments yet. Add links to your resume, cover letter, or other documents from Google Drive.
                 </div>
-              ))
-            ) : (
-              <div className="no-attachments">
-                No attachments yet. Add links to your resume, cover letter, or other documents from Google Drive.
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
         </div>
 
-        <div className="detail-card">
-          <div className="section-header">
+        <div className="detail-card collapsible">
+          <div className="section-header collapsible-header" onClick={() => toggleSection('contacts')}>
             <h3 className="section-title">Contacts ({job.contacts?.length || 0})</h3>
-            <button
-              className="btn btn-primary btn-small"
-              onClick={() => setShowContactForm(!showContactForm)}
-            >
-              {showContactForm ? '✕ Cancel' : '+ Add Contact'}
-            </button>
+            <div className="header-right">
+              <button
+                className="btn btn-primary btn-small"
+                onClick={(e) => { e.stopPropagation(); setShowContactForm(!showContactForm); }}
+              >
+                {showContactForm ? '✕ Cancel' : '+ Add Contact'}
+              </button>
+              <span className="collapse-icon">{collapsed.contacts ? '▼' : '▲'}</span>
+            </div>
           </div>
 
           {showContactForm && (
@@ -416,50 +437,52 @@ function JobDetails({ job, onEdit, onDelete, onAddAttachment, onDeleteAttachment
             </form>
           )}
 
-          <div className="attachments-list">
-            {job.contacts && job.contacts.length > 0 ? (
-              job.contacts.map((contact) => (
-                <div key={contact.id} className="attachment-item contact-item">
-                  <div className="attachment-info">
-                    <span className="attachment-icon">👤</span>
-                    <div className="contact-details">
-                      <div className="attachment-name">{contact.name}</div>
-                      {contact.position && (
-                        <div className="attachment-type">{contact.position}</div>
-                      )}
-                      {contact.email && (
-                        <div className="contact-email">{contact.email}</div>
-                      )}
-                      {contact.phone && (
-                        <div className="contact-phone">{contact.phone}</div>
-                      )}
-                      {contact.notes && (
-                        <div className="contact-notes">{contact.notes}</div>
-                      )}
-                      <div className="contact-actions">
-                        <button
-                          className="btn-link"
-                          onClick={() => handleEditContact(contact)}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          className="btn-link danger"
-                          onClick={() => onDeleteContact(contact.id)}
-                        >
-                          Delete
-                        </button>
+          {!collapsed.contacts && (
+            <div className="attachments-list">
+              {job.contacts && job.contacts.length > 0 ? (
+                job.contacts.map((contact) => (
+                  <div key={contact.id} className="attachment-item contact-item">
+                    <div className="attachment-info">
+                      <span className="attachment-icon">👤</span>
+                      <div className="contact-details">
+                        <div className="attachment-name">{contact.name}</div>
+                        {contact.position && (
+                          <div className="attachment-type">{contact.position}</div>
+                        )}
+                        {contact.email && (
+                          <div className="contact-email">{contact.email}</div>
+                        )}
+                        {contact.phone && (
+                          <div className="contact-phone">{contact.phone}</div>
+                        )}
+                        {contact.notes && (
+                          <div className="contact-notes">{contact.notes}</div>
+                        )}
+                        <div className="contact-actions">
+                          <button
+                            className="btn-link"
+                            onClick={() => handleEditContact(contact)}
+                          >
+                            Edit
+                          </button>
+                          <button
+                            className="btn-link danger"
+                            onClick={() => onDeleteContact(contact.id)}
+                          >
+                            Delete
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
+                ))
+              ) : (
+                <div className="no-attachments">
+                  No contacts yet. Add people you've met at this company.
                 </div>
-              ))
-            ) : (
-              <div className="no-attachments">
-                No contacts yet. Add people you've met at this company.
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>

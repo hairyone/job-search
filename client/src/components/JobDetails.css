@@ -319,3 +319,29 @@ textarea:focus {
   line-height: 1.5;
   white-space: pre-wrap;
 }
+
+.detail-card.collapsible .collapsible-header {
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.detail-card.collapsible .collapsible-header:hover {
+  background: #f8f9fa;
+  margin: -0.75rem -0.75rem 0.5rem -0.75rem;
+  padding: 0.75rem;
+  border-radius: 8px 8px 0 0;
+}
+
+.section-header .header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.collapse-icon {
+  font-size: 0.75rem;
+  color: #6c757d;
+  padding: 0.25rem;
+}
