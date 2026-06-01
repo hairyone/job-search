@@ -5,9 +5,14 @@ set -e
 
 git pull
 
-# Use docker compose v2 if available, otherwise fall back to v1 (docker-compose).
+# Pick docker compose v2 if installed, otherwise fall back to v1.
 if docker compose version >/dev/null 2>&1; then
-    docker compose up -d --build
+    COMPOSE="docker compose"
 else
-    docker-compose up -d --build
+    COMPOSE="docker-compose"
 fi
+
+# `down` then `up` avoids the v1 KeyError: 'ContainerConfig' bug on recreate.
+# Named volumes and bind mounts are preserved by `down`.
+$COMPOSE down
+$COMPOSE up -d --build
