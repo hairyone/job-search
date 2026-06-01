@@ -1,19 +1,12 @@
-version: '3.8'
-
 services:
-  # PostgreSQL Database
   postgres:
     image: postgres:15
     container_name: job-tracker-db
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password123
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: job_tracker
-    ports:
-      - "5432:5432"
     volumes:
-      # Store data on host filesystem (easier to backup and access)
-      # Your job application data will be in ./data/postgres/
       - ./data/postgres:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
@@ -24,12 +17,11 @@ services:
     networks:
       - job-tracker-network
 
-  # Job Tracker Application
   app:
     build: .
     container_name: job-tracker-app
     environment:
-      DATABASE_URL: postgresql://postgres:password123@postgres:5432/job_tracker
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/job_tracker
       PORT: 3000
       NODE_ENV: production
       AUTH_USERNAME: ${AUTH_USERNAME}

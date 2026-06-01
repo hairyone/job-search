@@ -3,6 +3,4 @@
 
 git pull
 
-docker rm -f job-tracker-app
-
-docker-compose -f docker-compose.full.yml up -d --build
+docker compose up -d --build

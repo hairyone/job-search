@@ -1,227 +1,229 @@
 # Job Application Tracker
 
-A full-stack web application to track job applications from Indeed, LinkedIn, and other sources. Features include progress tracking, Google Drive attachment integration, and comprehensive statistics.
+A self-hosted web app to track job applications from Indeed, LinkedIn, and other sources. Tracks progress, statuses, salary, contacts, dated notes, and Google Drive attachments. Runs entirely in Docker.
 
-![Job Tracker](https://img.shields.io/badge/Status-Ready%20to%20Use-brightgreen)
+## Quick Start
 
-## ⚡ Quick Start - Run Locally on Your Laptop
-
-**Not sure which setup to use?** See **[WHICH-SETUP.md](WHICH-SETUP.md)** to help you decide!
-
-**Choose your preferred setup:**
-
-### 🐳 Option 1: Everything in Docker (Easiest - No Node.js needed!)
-
-**Just have Docker?** Run everything in containers:
+**Prerequisites:** [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 
 ```bash
-docker-compose -f docker-compose.full.yml up -d
+cp .env.example .env       # Optional: edit credentials
+docker compose up -d       # Build and start the stack
 ```
 
-Open http://localhost:3000 - Done! 🎉
+Open http://localhost:3000
 
-**Details:** [DOCKER-FULL.md](DOCKER-FULL.md)
-
-### 💻 Option 2: Traditional Development (With Node.js installed)
-
-**Automated Setup:**
-
-**Linux/Mac:**
-```bash
-./start-local.sh
-```
-
-**Windows:**
-```bash
-start-local.bat
-```
-
-**Manual Setup:**
-
-```bash
-# 1. Install dependencies
-npm run install:all
-
-# 2. Start database (using Docker Compose)
-docker-compose up -d
-
-# 3. Create .env file
-cp .env.example .env
-
-# 4. Start the app
-npm run local
-```
-
-Open http://localhost:3000 and you're done! 🎉
-
-**Details:** [LOCAL-SETUP.md](LOCAL-SETUP.md) | [QUICKSTART.md](QUICKSTART.md)
-
----
+The first startup builds the app image (~2 min) and creates the database schema automatically.
 
 ## Features
 
-- 📝 Track job applications from Indeed, LinkedIn, and other sources
-- 📊 Real-time statistics and analytics
-- 🔍 Search and filter capabilities
-- 📎 Google Drive attachment integration
-- 🎯 Multiple status tracking (Applied, Interview Scheduled, Offer, etc.)
-- 💰 Salary range tracking
-- 📍 Location and company information
-- 📅 Application date tracking
-- 📱 Responsive mobile-friendly design
+- Track applications from Indeed, LinkedIn, and other sources
+- Multiple status tracking (Applied, Interview Scheduled, Offer, Rejected, etc.)
+- Salary range, location, and company information
+- Dated notes per application (call logs, follow-ups, etc.)
+- Contacts per application (recruiters, hiring managers)
+- Google Drive attachment links (resumes, cover letters)
+- Real-time statistics and analytics
+- Search and filter by status, source, or text
+- Mobile-friendly responsive design
 
 ## Tech Stack
 
-- **Frontend**: React 18
-- **Backend**: Node.js + Express
-- **Database**: PostgreSQL
-- **Local Hosting**: Docker (recommended) or native PostgreSQL
-- **Hosting**: Local (your laptop) or any Docker-compatible cloud service
+- **Frontend:** React 18
+- **Backend:** Node.js + Express
+- **Database:** PostgreSQL 15
+- **Hosting:** Docker (single `docker compose up -d`)
 
-## Local Development
+## Architecture
 
-**📖 See [LOCAL-SETUP.md](LOCAL-SETUP.md) for complete instructions with troubleshooting.**
+The stack runs as two containers connected by a private Docker network:
 
-### Prerequisites
+| Service  | Image              | Port  | Purpose                        |
+|----------|--------------------|-------|--------------------------------|
+| `app`    | Built from `Dockerfile` | 3000 | Express API + React build served as static files |
+| `postgres` | `postgres:15`   | 5432  | Database (bind-mounted to `./data/postgres/`) |
 
-- Node.js 18 or higher
-- Docker Desktop (easiest) OR native PostgreSQL
+The `app` container waits for `postgres` to pass its healthcheck before starting. The Express server automatically runs schema migrations on first start.
 
-### Quick Setup
+## Configuration
 
-1. **Install dependencies**
-   ```bash
-   npm run install:all
-   ```
+All configuration is in `.env` (created from `.env.example`):
 
-2. **Start local database** (using Docker)
-   ```bash
-   docker run --name job-tracker-db \
-     -e POSTGRES_PASSWORD=password123 \
-     -e POSTGRES_DB=job_tracker \
-     -p 5432:5432 \
-     -d postgres:15
-   ```
+| Variable | Description |
+|----------|-------------|
+| `POSTGRES_PASSWORD` | Database password. Must match in both `postgres` and `app` services. |
+| `AUTH_USERNAME` | HTTP Basic Auth username. Leave blank to disable. |
+| `AUTH_PASSWORD` | HTTP Basic Auth password. Leave blank to disable. |
 
-3. **Create `.env` file** in the root directory:
-   ```env
-   DATABASE_URL=postgresql://postgres:password123@localhost:5432/job_tracker
-   PORT=3001
-   NODE_ENV=development
-   ```
-
-4. **Start the application**
-   ```bash
-   npm run local
-   ```
-
-5. **Access the application**
-   - Frontend: http://localhost:3000
-   - Backend API: http://localhost:3001/api
-
-The database schema is created automatically on first startup!
-
-### Useful Commands
+## Commands
 
 ```bash
-npm run install:all    # Install all dependencies
-npm run local          # Start both frontend and backend
-npm run dev            # Start backend only
-npm run client         # Start frontend only
-npm run build          # Build for production
+# Start the stack
+docker compose up -d
+
+# View logs
+docker compose logs -f
+
+# Rebuild the app image (after pulling code changes)
+docker compose up -d --build
+
+# Stop the stack
+docker compose down
+
+# Stop and delete all data (irreversible)
+docker compose down -v
+
+# Access the database directly
+docker exec -it job-tracker-db psql -U postgres job_tracker
+
+# Access the app container shell
+docker exec -it job-tracker-app sh
 ```
 
----
+Or use the npm scripts (shortcuts for the above):
 
-## Production Deployment (Optional)
+```bash
+npm run up        # docker compose up -d
+npm run logs      # docker compose logs -f
+npm run rebuild   # docker compose up -d --build
+npm run down      # docker compose down
+```
 
-This application is designed primarily for **local use on your laptop**. However, if you want to deploy it to the cloud, the Docker setup makes it easy.
+## Data Storage
 
-### Deploy to Any Cloud Provider
+Your job application data is stored in a bind-mounted directory on the host:
 
-The included `Dockerfile` works with any platform that supports Docker:
+```
+./data/postgres/
+```
 
-- **AWS** (EC2, ECS, App Runner)
-- **Azure** (Container Instances, App Service)
-- **Google Cloud** (Cloud Run, Compute Engine)
-- **DigitalOcean** (App Platform, Droplets)
-- **Fly.io**
-- **Render**
-- Or any VPS with Docker installed
+This folder is in `.gitignore` so it won't be committed. It contains the raw PostgreSQL data files.
 
-### Quick Deploy Steps
+**Why bind-mount instead of a Docker volume?** Your data is visible in your file browser, can be backed up with normal file tools, and can be synced to cloud storage (Dropbox, iCloud Drive, Google Drive) automatically.
 
-1. **Build the Docker image:**
-   ```bash
-   docker build -t job-tracker .
-   ```
+## Backup & Restore
 
-2. **Push to your cloud provider's registry** (varies by provider)
+### Automatic backup (recommended)
 
-3. **Set environment variables:**
-   - `DATABASE_URL` - Your cloud PostgreSQL connection string
-   - `PORT` - Usually 3000
-   - `NODE_ENV` - Set to `production`
-   - `AUTH_USERNAME` - Basic auth username (optional but recommended)
-   - `AUTH_PASSWORD` - Basic auth password (optional but recommended)
+```bash
+# Linux/Mac
+./backup.sh
 
-4. **Deploy the container** (process varies by provider)
+# Windows
+backup.bat
+```
 
-### Why Run Locally Instead?
+This creates a compressed SQL dump in `~/Backups/job-tracker/` and keeps the last 30 days.
 
-- ✅ **Free** - No monthly costs
-- ✅ **Private** - Your data stays on your computer
-- ✅ **Fast** - No network latency
-- ✅ **Simple** - No cloud account setup
-- ✅ **Offline** - Works without internet
-- ✅ **Full control** - No vendor lock-in
+### Manual backup
 
-Most users find local hosting perfect for personal job tracking!
+```bash
+# Create SQL dump
+docker exec job-tracker-db pg_dump -U postgres job_tracker | gzip > backup-$(date +%Y%m%d).sql.gz
 
----
+# Restore
+gunzip -c backup-20260510.sql.gz | docker exec -i job-tracker-db psql -U postgres job_tracker
+```
+
+### File-system backup
+
+```bash
+# Stop the database
+docker compose down
+
+# Copy the data folder
+cp -r ./data/postgres ./data/postgres-backup-$(date +%Y%m%d)
+
+# Restart
+docker compose up -d
+```
+
+### Cloud sync
+
+Put the project (or just the `data/` folder) in a cloud-synced directory like Dropbox or iCloud Drive for automatic off-site backup.
+
+## Updating
+
+After pulling new code:
+
+```bash
+docker compose up -d --build
+```
+
+If you encounter `'ContainerConfig' KeyError` during rebuild (a known docker-compose bug):
+
+```bash
+docker compose down
+docker compose up -d --build
+```
 
 ## API Endpoints
 
 ### Jobs
-- `GET /api/jobs` - Get all jobs (supports filtering)
-- `GET /api/jobs/:id` - Get single job with details
-- `POST /api/jobs` - Create new job
+- `GET /api/jobs` - List jobs (supports `?status=`, `?source=`, `?search=`)
+- `GET /api/jobs/:id` - Single job with attachments, contacts, and notes
+- `POST /api/jobs` - Create job
 - `PUT /api/jobs/:id` - Update job
 - `DELETE /api/jobs/:id` - Delete job
-- `GET /api/jobs/stats/summary` - Get statistics
+- `GET /api/jobs/stats/summary` - Aggregate statistics
 
 ### Attachments
-- `GET /api/attachments/job/:jobId` - Get attachments for a job
-- `POST /api/attachments` - Add attachment
+- `GET /api/attachments/job/:jobId` - List attachments for a job
+- `POST /api/attachments` - Add Google Drive attachment link
 - `DELETE /api/attachments/:id` - Delete attachment
+
+### Health
+- `GET /api/health` - Liveness check (no auth required)
 
 ## Database Schema
 
-### Jobs Table
-- `id`, `company`, `position`, `source`, `status`, `job_url`, `location`
-- `salary_range`, `description`, `notes`, `applied_date`
-- `created_at`, `updated_at`
+### jobs
+`id, company, position, source, status, job_url, location, salary_range, description, applied_date, created_at, updated_at`
 
-### Attachments Table
-- `id`, `job_id`, `file_name`, `file_type`
-- `google_drive_id`, `google_drive_url`, `created_at`
+### attachments
+`id, job_id, file_name, file_type, google_drive_id, google_drive_url, created_at`
 
-### Contacts Table
-- `id`, `job_id`, `name`, `email`, `phone`, `position`, `notes`, `created_at`
+### contacts
+`id, job_id, name, email, phone, position, notes, created_at`
+
+### job_notes
+`id, job_id, note_date, note_text, created_at`
+
+Migrations live in `server/migrations/` and run automatically on container startup.
 
 ## Security
 
-When running locally, the application is only accessible from your computer (localhost). 
+- The app uses HTTP Basic Auth when `AUTH_USERNAME` and `AUTH_PASSWORD` are set in `.env`. Set them in production deployments.
+- The PostgreSQL port (`5432`) is not published to the host — only the app container can reach the database over the private Docker network.
+- Database password is configurable via `POSTGRES_PASSWORD` in `.env`. The default in `.env.example` is `password123` — change it before exposing this stack to the internet.
 
-If you deploy to a cloud provider, it's **strongly recommended** to set up authentication:
-- Set `AUTH_USERNAME` and `AUTH_PASSWORD` environment variables
-- The app uses HTTP Basic Authentication to protect your data
-- You'll be prompted for username/password when accessing the app
+## Troubleshooting
+
+**Port 3000 already in use**
+Edit `docker-compose.yml` and change `"3000:3000"` to `"3001:3000"` (or any free port).
+
+**App container keeps restarting**
+```bash
+docker compose logs app
+```
+Usually means the database isn't ready yet. The `depends_on: condition: service_healthy` should prevent this; if it persists, check that Docker has enough resources allocated.
+
+**Build fails with `'ContainerConfig' KeyError`**
+Run `docker compose down` then `docker compose up -d --build`.
+
+**Permission errors on `./data/postgres`**
+```bash
+sudo chown -R 999:999 ./data/postgres
+```
+(PostgreSQL in the container runs as UID 999.)
+
+**Want to start completely fresh**
+```bash
+docker compose down -v          # WARNING: deletes all data
+rm -rf ./data/postgres
+docker compose up -d --build
+```
 
 ## License
 
 MIT
-
-## Support
-
-For issues or questions, please open an issue on GitHub.
