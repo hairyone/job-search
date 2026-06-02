@@ -43,6 +43,9 @@ const initialize = async () => {
       END $$;
     `);
 
+    // PL/pgSQL DO blocks don't support $1 bind parameters, so embed the
+    // hardcoded status list as a literal. Single quotes are escaped.
+    const statusList = STATUSES.map((s) => `'${s.replace(/'/g, "''")}'`).join(',');
     await client.query(`
       DO $$
       BEGIN
@@ -50,10 +53,10 @@ const initialize = async () => {
           SELECT 1 FROM pg_constraint WHERE conname = 'jobs_status_check'
         ) THEN
           ALTER TABLE jobs ADD CONSTRAINT jobs_status_check
-            CHECK (status = ANY($1::text[]));
+            CHECK (status IN (${statusList}));
         END IF;
       END $$;
-    `, [STATUSES]);
+    `);
 
     await client.query(`
       CREATE TABLE IF NOT EXISTS attachments (
