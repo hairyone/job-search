@@ -1,7 +1,7 @@
 import React from 'react';
 import './Header.css';
 
-function Header({ onAddJob, filters, setFilters }) {
+function Header({ onAddJob, filters, setFilters, statuses = [] }) {
   return (
     <header className="header">
       <div className="header-content">
@@ -35,16 +35,9 @@ function Header({ onAddJob, filters, setFilters }) {
             className="filter-select"
           >
             <option value="">All Statuses</option>
-            <option value="Saved">Saved</option>
-            <option value="Applied">Applied</option>
-            <option value="Interview Scheduled">Interview Scheduled</option>
-            <option value="Interviewed">Interviewed</option>
-            <option value="Offer">Offer</option>
-            <option value="No Response">No Response</option>
-            <option value="Applications Closed">Applications Closed</option>
-            <option value="Rejected">Rejected</option>
-            <option value="Declined">Declined</option>
-            <option value="Accepted">Accepted</option>
+            {statuses.map((s) => (
+              <option key={s} value={s}>{s}</option>
+            ))}
           </select>
 
           <button className="btn btn-primary" onClick={onAddJob}>

@@ -14,6 +14,7 @@ function App() {
   const [editingJob, setEditingJob] = useState(null);
   const [filters, setFilters] = useState({ status: '', source: '', search: '' });
   const [stats, setStats] = useState(null);
+  const [statuses, setStatuses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showMobileList, setShowMobileList] = useState(true);
 
@@ -36,6 +37,10 @@ function App() {
     } catch (error) {
       console.error('Failed to fetch stats:', error);
     }
+  }, []);
+
+  useEffect(() => {
+    api.getStatuses().then(setStatuses).catch(console.error);
   }, []);
 
   useEffect(() => {
@@ -194,7 +199,7 @@ function App() {
 
   return (
     <div className="app">
-      <Header onAddJob={handleAddJob} filters={filters} setFilters={setFilters} />
+      <Header onAddJob={handleAddJob} filters={filters} setFilters={setFilters} statuses={statuses} />
       
       <div className="main-container">
         <aside className={`sidebar ${showMobileList ? 'show-mobile' : 'hide-mobile'}`}>
@@ -218,6 +223,7 @@ function App() {
               job={editingJob}
               onSave={handleSaveJob}
               onCancel={() => setShowForm(false)}
+              statuses={statuses}
             />
           ) : selectedJob ? (
             <JobDetails

@@ -46,13 +46,7 @@
 
 ## Architecture / Maintainability
 
-1. **Status list duplicated 6+ times** — adding a new status means editing 6 files. Single source of truth (a shared `statuses.js` or DB-driven enum) would help:
-   - `server/db.js:51-52` (CHECK constraint)
-   - `server/migrations/001_add_new_statuses.sql:9`
-   - `server/routes/jobs.js:292-296` (stats SELECT)
-   - `client/src/components/JobForm.js:73-83`
-   - `client/src/components/Header.js:38-48`
-   - `client/src/components/JobList.js:7-17` and `JobDetails.js:35-45` (color map)
+1. ~~**Status list duplicated 6+ times** — adding a new status means editing 6 files.~~ → **Resolved.** Single source of truth: `server/constants/statuses.js`. The server imports it for the `CHECK` constraint (`server/db.js:53`) and exposes it via `GET /api/jobs/statuses` (`server/routes/jobs.js:7-9`). The client fetches it on mount and passes the list to `Header` and `JobForm` as a prop. Adding a new status now requires editing only that one file (plus adding a colour entry to the client-side `STATUS_COLORS` map, which is a visual concern, not a list concern).
 
 2. **Status color map duplicated** between `JobList.js:7-17` and `JobDetails.js:35-45` — extract to a shared module.
 
@@ -80,6 +74,7 @@
 - ~~Multiple setup paths (Docker / hybrid / native)~~ → Project is now Docker-only.
 - ~~`update.sh` uses `docker-compose` v1 command without fallback~~ → Now detects v1/v2 and uses the right binary.
 - ~~`update.sh` triggered the v1 `KeyError: 'ContainerConfig'` bug on rebuild~~ → Workaround: `down` then `up -d --build`. (Long-term fix is to install docker compose v2.)
+- ~~Status list duplicated 6+ times across server + client~~ → Single source of truth at `server/constants/statuses.js`, exposed via API.
 
 ## Recommended Priority
 

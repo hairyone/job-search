@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './JobForm.css';
 
-function JobForm({ job, onSave, onCancel }) {
+function JobForm({ job, onSave, onCancel, statuses = [] }) {
   const [formData, setFormData] = useState({
     company: job?.company || '',
     position: job?.position || '',
@@ -70,16 +70,9 @@ function JobForm({ job, onSave, onCancel }) {
           <div className="form-group">
             <label>Status *</label>
             <select name="status" value={formData.status} onChange={handleChange} required>
-              <option value="Saved">Saved</option>
-              <option value="Applied">Applied</option>
-              <option value="Interview Scheduled">Interview Scheduled</option>
-              <option value="Interviewed">Interviewed</option>
-              <option value="Offer">Offer</option>
-              <option value="No Response">No Response</option>
-              <option value="Applications Closed">Applications Closed</option>
-              <option value="Rejected">Rejected</option>
-              <option value="Declined">Declined</option>
-              <option value="Accepted">Accepted</option>
+              {statuses.map((s) => (
+                <option key={s} value={s}>{s}</option>
+              ))}
             </select>
           </div>
         </div>

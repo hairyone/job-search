@@ -1,6 +1,7 @@
 require('dotenv').config();
 const pool = require('./pool');
 const { runMigrations } = require('./migrate');
+const { STATUSES } = require('./constants/statuses');
 
 const initialize = async () => {
   let client;
@@ -49,10 +50,10 @@ const initialize = async () => {
           SELECT 1 FROM pg_constraint WHERE conname = 'jobs_status_check'
         ) THEN
           ALTER TABLE jobs ADD CONSTRAINT jobs_status_check
-            CHECK (status IN ('Saved', 'Applied', 'Interview Scheduled', 'Interviewed', 'Offer', 'Rejected', 'Declined', 'Accepted', 'No Response', 'Applications Closed'));
+            CHECK (status = ANY($1::text[]));
         END IF;
       END $$;
-    `);
+    `, [STATUSES]);
 
     await client.query(`
       CREATE TABLE IF NOT EXISTS attachments (

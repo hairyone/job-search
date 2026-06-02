@@ -1,6 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db');
+const { STATUSES } = require('../constants/statuses');
+
+// List available job statuses
+router.get('/statuses', (req, res) => {
+  res.json(STATUSES);
+});
 
 // Get all jobs with optional filtering
 router.get('/', async (req, res) => {

@@ -39,6 +39,11 @@ const api = {
     return response.data;
   },
 
+  getStatuses: async () => {
+    const response = await axios.get(`${API_URL}/jobs/statuses`);
+    return response.data;
+  },
+
   // Attachments
   getAttachments: async (jobId) => {
     const response = await axios.get(`${API_URL}/attachments/job/${jobId}`);
